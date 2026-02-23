@@ -47,7 +47,7 @@ print(table(vp_data$MESSAGE_A))
 cat("\n In percentage \n")
 print(round(prop.table(table(vp_data$MESSAGE_A))*100,2))
 
-# Understand the affect of treatment on persuasion
+# Understand the effect of treatment on persuasion
 cat("\nEffect of Message treatmet on persuasion\n")
 vp_data$campain_msg <- ifelse(vp_data$MESSAGE_A ==1, "Received" , "Not Received")
 print(vp_data %>% group_by(campain_msg) %>% summarise(count = n(), Persuaded = sum(MOVED_A)) %>% mutate(Persuaded_Per_Msg = Persuaded/count*100 ))
@@ -93,7 +93,6 @@ print(vp_data %>% group_by(CAND2S) %>%
 cat("\n---------------------------\n")
 cat("\nData Visualizations\n")
 cat("\n---------------------------\n")
-library(ggplot2)
 # Age Distribution
 hist(vp_data$AGE, main = "Age Distribution", xlab = "Age")
 
@@ -131,7 +130,7 @@ cor_data <- vp_data %>%
 
 select_cor <- vp_data %>%select(MOVED_A, MESSAGE_A, PARTY_D, PARTY_R, PARTY_I, AGE, 
                                 GENDER_F, GENDER_M, MED_HH_INC, HH_ND, HH_NR, HH_NI,
-                                VG_04, VG_06, VG_08, VG_10, VG_12) %>% cor()
+                                VG_04, VG_06, VG_08, VG_10, VG_12,POLITICALC,NL5G,NL3PR,NL5AP) %>% cor()
 corrplot::corrplot(select_cor)
 
 
@@ -144,12 +143,14 @@ cat("\n---------------------------\n")
 
 # Creating a new variable 'vote_count' to get number of times a voter voted in previous elections
 vp_data$vote_count <- vp_data$VG_04 + vp_data$VG_06 + vp_data$VG_08 + vp_data$VG_10 + vp_data$VG_12
-summary(vp_data$vote_count)
+cat("\nCreating a new variable 'vote_count' \n")
+print(summary(vp_data$vote_count))
 
 # Selecting the data for modeling
 modeling_Voterdata <- vp_data[, c('MOVED_A','MESSAGE_A', 'AGE', 'GENDER', 'MED_HH_INC',
-                              'PARTY_D', 'PARTY_R', 'vote_count','CAND1S','CAND2S')]
-
+                                  'PARTY_D', 'PARTY_R', 'vote_count','CAND1S','CAND2S')]
+cat("\nSelected columns for Modeling:\n")
+print(colnames(modeling_Voterdata))
 
 # Convert Binary variables to factor
 factor_cols <- c('MOVED_A','MESSAGE_A',
@@ -171,28 +172,29 @@ cat("\n---------------------------\n")
 
 cat("\n--------- Logistic Regression Model-----------\n")
 
-# Standardize the modeling data
-std_model <- preProcess(modeling_Voterdata, method = c('center','scale'))
-
-modeling_Voterdata_std <- predict(std_model,modeling_Voterdata)
 
 # Split the modeling data into train (70%) and test (30%)
-set.seed(2026)
-idx = createDataPartition(modeling_Voterdata_std$MOVED_A, p = 0.7, list=FALSE)
+idx = createDataPartition(modeling_Voterdata$MOVED_A, p = 0.7, list=FALSE)
 
-train_voterdata <- modeling_Voterdata_std[idx,]
-test_voterdata <- modeling_Voterdata_std[-idx,]
+train_voterdata <- modeling_Voterdata[idx,]
+test_voterdata <- modeling_Voterdata[-idx,]
+
+# Standardize the modeling data
+std_model <- preProcess(train_voterdata, method = c('center','scale'))
+
+train_voterdata_std <- predict(std_model,train_voterdata)
+test_voterdata_std <- predict(std_model,test_voterdata)
 
 # Check the proportion of the data
 cat("\nTraining data MOVED_A distribution\n")
-print(round(prop.table(table(train_voterdata$MOVED_A))*100,2))
+print(round(prop.table(table(train_voterdata_std$MOVED_A))*100,2))
 
 cat("\nTest data MOVED_A distribution\n")
-print(round(prop.table(table(test_voterdata$MOVED_A))*100,2))
+print(round(prop.table(table(test_voterdata_std$MOVED_A))*100,2))
 
 # Fit the model
 cat("\nLogistic Model Fit")
-model_glm <- glm(MOVED_A ~ ., data = train_voterdata, family = "binomial")
+model_glm <- glm(MOVED_A ~ ., data = train_voterdata_std, family = "binomial")
 
 
 # Look at the model results
@@ -202,29 +204,25 @@ print(summary(model_glm))
 # Make predictions on the test set
 # Get probabilities (between 0 and 1)
 logistic_probabilities <- predict(model_glm, 
-                                  newdata = test_voterdata, 
+                                  newdata = test_voterdata_std, 
                                   type = "response")
 
 # Convert probabilities to Yes/No predictions, If probability > 0.5, predict Yes, otherwise No
 logistic_predictions <- ifelse(logistic_probabilities > 0.5, "1", "0")
 logistic_predictions <- factor(logistic_predictions, levels = c("1", "0"))
 
-
-
-
 cat("Model Evaluation")
-
 
 # Evaluate the model using a confusion matrix
 logistic_cm <- confusionMatrix(logistic_predictions, 
-                               test_voterdata$MOVED_A, 
+                               test_voterdata_std$MOVED_A, 
                                positive = "1")
 cat("\nLogistic Regression - Confusion Matrix:\n")
 print(logistic_cm)
 
 # Plot the ROC curve
 library(pROC)
-roc_score <- roc(test_voterdata$MOVED_A, logistic_probabilities)
+roc_score <- roc(test_voterdata_std$MOVED_A, logistic_probabilities)
 plot(roc_score, main="ROC Curve for Logistic Regression Model", print.auc = TRUE,)
 
 logistic_auc <- auc(roc_score)
@@ -233,13 +231,32 @@ cat("\nLogistic Regression AUC:", round(logistic_auc, 4), "\n")
 cat("(AUC ranges from 0.5 to 1.0; higher is better)\n")
 
 # Show the most important coefficients
-# Positive coefficient = increases probability of persuasion
-# Negative coefficient = decreases probability of persuasion
-coefficients <- coef(model_glm)
+coef_table <- as.data.frame(summary(model_glm)$coefficients)
+
+coef_table <- rename(coef_table,  p_value = "Pr(>|z|)")
+positive_significant <- coef_table %>%
+  filter(
+    Estimate > 0,
+    p_value < 0.01,
+    rownames(.) != "(Intercept)"
+  ) %>%
+  arrange(desc(Estimate)) %>%
+  select(Estimate) %>%
+  head(5)
+
+negative_significant <- coef_table %>%
+  filter(
+    Estimate < 0,
+    p_value < 0.05,
+    rownames(.) != "(Intercept)"
+  ) %>%
+  arrange(Estimate) %>%
+  select(Estimate) %>%
+  head(5)
 cat("\nTop 5 Positive Effects (increase persuasion):\n")
-print(head(sort(coefficients, decreasing = TRUE), 5))
+print(positive_significant)
 cat("\nTop 5 Negative Effects (decrease persuasion):\n")
-print(head(sort(coefficients, decreasing = FALSE), 5))
+print(negative_significant)
 
 # -----------Decision Tree Model--------------
 cat("\n-----------Decision Tree Model--------------\n")
@@ -247,25 +264,19 @@ library(rpart)
 library(rpart.plot)
 set.seed(2026)
 
-# Split the data into train and test using the un standardized modeling data
-cat("\nSplit the un standardized modeling data\n")
-idx2 = createDataPartition(modeling_Voterdata$MOVED_A, p = 0.7, list=FALSE)
-
-train_dt_voterdata <- modeling_Voterdata[idx2,]
-test_dt_voterdata <- modeling_Voterdata[-idx2,]
 
 # Check the proportion of the train and test data
 cat("\nCheck the proportion of the train and test data\n")
 cat("\nTraining data MOVED_A distribution\n")
-print(round(prop.table(table(train_dt_voterdata$MOVED_A))*100,2))
+print(round(prop.table(table(train_voterdata$MOVED_A))*100,2))
 
 cat("\nTest data MOVED_A distribution\n")
-print(round(prop.table(table(test_dt_voterdata$MOVED_A))*100,2))
-print(table(test_dt_voterdata$MOVED_A))
+print(round(prop.table(table(test_voterdata$MOVED_A))*100,2))
+print(table(test_voterdata$MOVED_A))
 
 # Fit the model and print
 cat("\n Build the Decision tree using training data")
-model_dt <- rpart(MOVED_A ~ ., data = train_dt_voterdata)
+model_dt <- rpart(MOVED_A ~ ., data = train_voterdata)
 cat("\nDecision Tree Output\n")
 print(model_dt)
 
@@ -273,18 +284,21 @@ print(model_dt)
 library(rattle)
 fancyRpartPlot(model_dt, main = "Decision Tree Plot")
 
+
 # Predict using the model on test data set
 cat("\nPredict and evaulate the decision tree using the test data\n")
-model_dt_pred <- predict(model_dt, test_dt_voterdata, type = 'class')
+model_dt_pred <- predict(model_dt, test_voterdata, type = 'class')
 
 # Decision Tree Confusion Matrix
 cat("\nDecision Tree - Confusion Matrix\n")
-dt_cm <- confusionMatrix(model_dt_pred, test_dt_voterdata$MOVED_A, positive ='1')
+dt_cm <- confusionMatrix(model_dt_pred, 
+                         test_voterdata$MOVED_A, 
+                         positive ='1')
 print(dt_cm)
 cat("\n The Decision tree seems overfitted as it has high accuracy.\n")
 
 # Print the complexity parameter values of the model to prune the model
-dev.off()
+par(mfrow = c(1, 1))
 printcp(model_dt)
 plotcp(model_dt)
 
@@ -295,13 +309,37 @@ cat("\nSet the cp value to 0.0137 as per 1-SE rule,\nIncrease the cross validati
 
 # Fit the model again using control parameters
 control = rpart.control(cp=0.0137, xval = 20, minbucket = 100)
-model_ctrl_dt <- rpart(MOVED_A ~ ., data = train_dt_voterdata, control = control)
+model_ctrl_dt <- rpart(MOVED_A ~ ., data = train_voterdata, control = control)
 cat("\nPruned Decision Tree\n")
 print(model_ctrl_dt)
 fancyRpartPlot(model_ctrl_dt, main = "Pruned Decision Tree Plot")
 
-cat("\nPruned Decision Tree - Confusion Matri\n")
-model_ctrl_dt_pred <- predict(model_ctrl_dt, test_dt_voterdata, type = 'class')
-ctrl_dt_cm <- confusionMatrix(model_ctrl_dt_pred, test_dt_voterdata$MOVED_A, positive ='1')
+cat("\nPruned Decision Tree - Confusion Matrix\n")
+model_ctrl_dt_pred <- predict(model_ctrl_dt, test_voterdata, type = 'class')
+ctrl_dt_cm <- confusionMatrix(model_ctrl_dt_pred,
+                              test_voterdata$MOVED_A, 
+                              positive ='1')
 print(ctrl_dt_cm)
 
+cat("\nRules of the tree which can be used in Campaign outreach planning:\n")
+print(rpart.rules(model_ctrl_dt))
+
+# Comparing the models
+comparison <- data.frame(
+  Model = c("Logistic Regression",
+            "Decision Tree (Unpruned)",
+            "Decision Tree (Pruned)"),
+  
+  Accuracy = c(logistic_cm$overall["Accuracy"],
+               dt_cm$overall["Accuracy"],
+               ctrl_dt_cm$overall["Accuracy"]),
+  
+  Sensitivity = c(logistic_cm$byClass["Sensitivity"],
+                  dt_cm$byClass["Sensitivity"],
+                  ctrl_dt_cm$byClass["Sensitivity"]),
+  
+  Specificity = c(logistic_cm$byClass["Specificity"],
+                  dt_cm$byClass["Specificity"],
+                  ctrl_dt_cm$byClass["Specificity"]))
+
+print(comparison)
