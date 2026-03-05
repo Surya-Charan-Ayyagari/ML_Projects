@@ -50,7 +50,9 @@ print(round(prop.table(table(vp_data$MESSAGE_A))*100,2))
 # Understand the effect of treatment on persuasion
 cat("\nEffect of Message treatmet on persuasion\n")
 vp_data$campain_msg <- ifelse(vp_data$MESSAGE_A ==1, "Received" , "Not Received")
-print(vp_data %>% group_by(campain_msg) %>% summarise(count = n(), Persuaded = sum(MOVED_A)) %>% mutate(Persuaded_Per_Msg = Persuaded/count*100 ))
+print(vp_data %>% group_by(campain_msg) %>% 
+        summarise(count = n(), Persuaded = sum(MOVED_A)) %>% 
+        mutate(Persuaded_Per_Msg = Persuaded/count*100 ))
 
 # understand the Party distribution among voters
 cat("\n Party distribution\n")
@@ -158,9 +160,6 @@ factor_cols <- c('MOVED_A','MESSAGE_A',
 
 modeling_Voterdata[factor_cols] <- lapply(modeling_Voterdata[factor_cols],as.factor)
 
-vp_data$CAND1S <- relevel(factor(vp_data$CAND1S), ref = "U")
-vp_data$CAND2S <- relevel(factor(vp_data$CAND2S), ref = "U")
-
 #------------------------------
 # Model Fitting and Evaluation
 #------------------------------
@@ -258,6 +257,39 @@ print(positive_significant)
 cat("\nTop 5 Negative Effects (decrease persuasion):\n")
 print(negative_significant)
 
+# Fit the logistic model with interaction terms
+cat("\nFit the logistic model with interaction terms\n")
+model_glm_intr <- glm(MOVED_A ~ . + MESSAGE_A:PARTY_R + MESSAGE_A:CAND2S, train_voterdata_std,family = 'binomial')
+print(summary(model_glm_intr))
+
+# Make predictions on the test set
+# Get probabilities (between 0 and 1)
+logistic_probabilities_intr <- predict(model_glm_intr, 
+                                  newdata = test_voterdata_std, 
+                                  type = "response")
+
+# Convert probabilities to Yes/No predictions, If probability > 0.5, predict Yes, otherwise No
+logistic_predictions_intr <- ifelse(logistic_probabilities_intr > 0.5, "1", "0")
+logistic_predictions_intr <- factor(logistic_predictions_intr, levels = c("1", "0"))
+
+cat("Model Evaluation")
+
+# Evaluate the model using a confusion matrix
+logistic_cm_intr <- confusionMatrix(logistic_predictions_intr, 
+                               test_voterdata_std$MOVED_A, 
+                               positive = "1")
+cat("\nLogistic Regression w. Interacton Terms - Confusion Matrix:\n")
+print(logistic_cm_intr)
+
+# Plot the ROC curve
+library(pROC)
+roc_score_intr <- roc(test_voterdata_std$MOVED_A, logistic_probabilities_intr)
+plot(roc_score_intr, main="ROC Curve for Logistic Regression Model w. Interactions", print.auc = TRUE,)
+
+logistic_auc_intr <- auc(roc_score_intr)
+
+cat("\nLogistic Regression w. InteractionsAUC:", round(logistic_auc_intr, 4), "\n")
+
 # -----------Decision Tree Model--------------
 cat("\n-----------Decision Tree Model--------------\n")
 library(rpart)
@@ -324,22 +356,29 @@ print(ctrl_dt_cm)
 cat("\nRules of the tree which can be used in Campaign outreach planning:\n")
 print(rpart.rules(model_ctrl_dt))
 
-# Comparing the models
+
+#------------------------------
+# Model Comparison
+#------------------------------
 comparison <- data.frame(
   Model = c("Logistic Regression",
+            "Logistic Regression (Interaction)",
             "Decision Tree (Unpruned)",
             "Decision Tree (Pruned)"),
   
   Accuracy = c(logistic_cm$overall["Accuracy"],
+               logistic_cm_intr$overall["Accuracy"],
                dt_cm$overall["Accuracy"],
                ctrl_dt_cm$overall["Accuracy"]),
   
   Sensitivity = c(logistic_cm$byClass["Sensitivity"],
+                  logistic_cm_intr$byClass["Sensitivity"],
                   dt_cm$byClass["Sensitivity"],
                   ctrl_dt_cm$byClass["Sensitivity"]),
   
   Specificity = c(logistic_cm$byClass["Specificity"],
+                  logistic_cm_intr$byClass["Specificity"],
                   dt_cm$byClass["Specificity"],
                   ctrl_dt_cm$byClass["Specificity"]))
 
-print(comparison)
+print(tibble(comparison))
