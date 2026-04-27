@@ -1,0 +1,1171 @@
+------------ DATA LOADING ------------
+Dataset loaded successfully.
+Number of rows   : 2240 
+Number of columns: 29 
+
+------------ INITIAL DATA QUALITY CHECK ------------
+Preview of first 6 rows:
+    ID Year_Birth  Education Marital_Status Income Kidhome Teenhome Dt_Customer Recency MntWines
+1 5524       1957 Graduation         Single  58138       0        0  04-09-2012      58      635
+2 2174       1954 Graduation         Single  46344       1        1  08-03-2014      38       11
+3 4141       1965 Graduation       Together  71613       0        0  21-08-2013      26      426
+4 6182       1984 Graduation       Together  26646       1        0  10-02-2014      26       11
+5 5324       1981        PhD        Married  58293       1        0  19-01-2014      94      173
+6 7446       1967     Master       Together  62513       0        1  09-09-2013      16      520
+  MntFruits MntMeatProducts MntFishProducts MntSweetProducts MntGoldProds NumDealsPurchases
+1        88             546             172               88           88                 3
+2         1               6               2                1            6                 2
+3        49             127             111               21           42                 1
+4         4              20              10                3            5                 2
+5        43             118              46               27           15                 5
+6        42              98               0               42           14                 2
+  NumWebPurchases NumCatalogPurchases NumStorePurchases NumWebVisitsMonth AcceptedCmp3 AcceptedCmp4
+1               8                  10                 4                 7            0            0
+2               1                   1                 2                 5            0            0
+3               8                   2                10                 4            0            0
+4               2                   0                 4                 6            0            0
+5               5                   3                 6                 5            0            0
+6               6                   4                10                 6            0            0
+  AcceptedCmp5 AcceptedCmp1 AcceptedCmp2 Complain Z_CostContact Z_Revenue Response
+1            0            0            0        0             3        11        1
+2            0            0            0        0             3        11        0
+3            0            0            0        0             3        11        0
+4            0            0            0        0             3        11        0
+5            0            0            0        0             3        11        0
+6            0            0            0        0             3        11        0
+
+Structure of dataset:
+'data.frame':	2240 obs. of  29 variables:
+ $ ID                 : int  5524 2174 4141 6182 5324 7446 965 6177 4855 5899 ...
+ $ Year_Birth         : int  1957 1954 1965 1984 1981 1967 1971 1985 1974 1950 ...
+ $ Education          : chr  "Graduation" "Graduation" "Graduation" "Graduation" ...
+ $ Marital_Status     : chr  "Single" "Single" "Together" "Together" ...
+ $ Income             : int  58138 46344 71613 26646 58293 62513 55635 33454 30351 5648 ...
+ $ Kidhome            : int  0 1 0 1 1 0 0 1 1 1 ...
+ $ Teenhome           : int  0 1 0 0 0 1 1 0 0 1 ...
+ $ Dt_Customer        : chr  "04-09-2012" "08-03-2014" "21-08-2013" "10-02-2014" ...
+ $ Recency            : int  58 38 26 26 94 16 34 32 19 68 ...
+ $ MntWines           : int  635 11 426 11 173 520 235 76 14 28 ...
+ $ MntFruits          : int  88 1 49 4 43 42 65 10 0 0 ...
+ $ MntMeatProducts    : int  546 6 127 20 118 98 164 56 24 6 ...
+ $ MntFishProducts    : int  172 2 111 10 46 0 50 3 3 1 ...
+ $ MntSweetProducts   : int  88 1 21 3 27 42 49 1 3 1 ...
+ $ MntGoldProds       : int  88 6 42 5 15 14 27 23 2 13 ...
+ $ NumDealsPurchases  : int  3 2 1 2 5 2 4 2 1 1 ...
+ $ NumWebPurchases    : int  8 1 8 2 5 6 7 4 3 1 ...
+ $ NumCatalogPurchases: int  10 1 2 0 3 4 3 0 0 0 ...
+ $ NumStorePurchases  : int  4 2 10 4 6 10 7 4 2 0 ...
+ $ NumWebVisitsMonth  : int  7 5 4 6 5 6 6 8 9 20 ...
+ $ AcceptedCmp3       : int  0 0 0 0 0 0 0 0 0 1 ...
+ $ AcceptedCmp4       : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ AcceptedCmp5       : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ AcceptedCmp1       : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ AcceptedCmp2       : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ Complain           : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ Z_CostContact      : int  3 3 3 3 3 3 3 3 3 3 ...
+ $ Z_Revenue          : int  11 11 11 11 11 11 11 11 11 11 ...
+ $ Response           : int  1 0 0 0 0 0 0 0 1 0 ...
+
+Summary statistics:
+       ID          Year_Birth        Education     Marital_Status     Income          Kidhome      
+ Min.   :    0   Min.   :1893   2n Cycle  : 203   Married :864    Min.   :  1730   Min.   :0.0000  
+ 1st Qu.: 2828   1st Qu.:1959   Basic     :  54   Together:580    1st Qu.: 35303   1st Qu.:0.0000  
+ Median : 5458   Median :1970   Graduation:1127   Single  :480    Median : 51382   Median :0.0000  
+ Mean   : 5592   Mean   :1969   Master    : 370   Divorced:232    Mean   : 52247   Mean   :0.4442  
+ 3rd Qu.: 8428   3rd Qu.:1977   PhD       : 486   Widow   : 77    3rd Qu.: 68522   3rd Qu.:1.0000  
+ Max.   :11191   Max.   :1996                     Alone   :  3    Max.   :666666   Max.   :2.0000  
+                                                  (Other) :  4    NA's   :24                       
+    Teenhome       Dt_Customer            Recency         MntWines         MntFruits    
+ Min.   :0.0000   Min.   :2012-07-30   Min.   : 0.00   Min.   :   0.00   Min.   :  0.0  
+ 1st Qu.:0.0000   1st Qu.:2013-01-16   1st Qu.:24.00   1st Qu.:  23.75   1st Qu.:  1.0  
+ Median :0.0000   Median :2013-07-08   Median :49.00   Median : 173.50   Median :  8.0  
+ Mean   :0.5062   Mean   :2013-07-10   Mean   :49.11   Mean   : 303.94   Mean   : 26.3  
+ 3rd Qu.:1.0000   3rd Qu.:2013-12-30   3rd Qu.:74.00   3rd Qu.: 504.25   3rd Qu.: 33.0  
+ Max.   :2.0000   Max.   :2014-06-29   Max.   :99.00   Max.   :1493.00   Max.   :199.0  
+                                                                                        
+ MntMeatProducts  MntFishProducts  MntSweetProducts  MntGoldProds    NumDealsPurchases
+ Min.   :   0.0   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   : 0.000   
+ 1st Qu.:  16.0   1st Qu.:  3.00   1st Qu.:  1.00   1st Qu.:  9.00   1st Qu.: 1.000   
+ Median :  67.0   Median : 12.00   Median :  8.00   Median : 24.00   Median : 2.000   
+ Mean   : 166.9   Mean   : 37.53   Mean   : 27.06   Mean   : 44.02   Mean   : 2.325   
+ 3rd Qu.: 232.0   3rd Qu.: 50.00   3rd Qu.: 33.00   3rd Qu.: 56.00   3rd Qu.: 3.000   
+ Max.   :1725.0   Max.   :259.00   Max.   :263.00   Max.   :362.00   Max.   :15.000   
+                                                                                      
+ NumWebPurchases  NumCatalogPurchases NumStorePurchases NumWebVisitsMonth  AcceptedCmp3    
+ Min.   : 0.000   Min.   : 0.000      Min.   : 0.00     Min.   : 0.000    Min.   :0.00000  
+ 1st Qu.: 2.000   1st Qu.: 0.000      1st Qu.: 3.00     1st Qu.: 3.000    1st Qu.:0.00000  
+ Median : 4.000   Median : 2.000      Median : 5.00     Median : 6.000    Median :0.00000  
+ Mean   : 4.085   Mean   : 2.662      Mean   : 5.79     Mean   : 5.317    Mean   :0.07277  
+ 3rd Qu.: 6.000   3rd Qu.: 4.000      3rd Qu.: 8.00     3rd Qu.: 7.000    3rd Qu.:0.00000  
+ Max.   :27.000   Max.   :28.000      Max.   :13.00     Max.   :20.000    Max.   :1.00000  
+                                                                                           
+  AcceptedCmp4      AcceptedCmp5      AcceptedCmp1      AcceptedCmp2        Complain       
+ Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.000000  
+ 1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.000000  
+ Median :0.00000   Median :0.00000   Median :0.00000   Median :0.00000   Median :0.000000  
+ Mean   :0.07455   Mean   :0.07277   Mean   :0.06429   Mean   :0.01339   Mean   :0.009375  
+ 3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.000000  
+ Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   Max.   :1.000000  
+                                                                                           
+ Z_CostContact   Z_Revenue     Response     
+ Min.   :3     Min.   :11   Min.   :0.0000  
+ 1st Qu.:3     1st Qu.:11   1st Qu.:0.0000  
+ Median :3     Median :11   Median :0.0000  
+ Mean   :3     Mean   :11   Mean   :0.1491  
+ 3rd Qu.:3     3rd Qu.:11   3rd Qu.:0.0000  
+ Max.   :3     Max.   :11   Max.   :1.0000  
+                                            
+
+Missing values in each column:
+                 ID          Year_Birth           Education      Marital_Status              Income 
+                  0                   0                   0                   0                  24 
+            Kidhome            Teenhome         Dt_Customer             Recency            MntWines 
+                  0                   0                   0                   0                   0 
+          MntFruits     MntMeatProducts     MntFishProducts    MntSweetProducts        MntGoldProds 
+                  0                   0                   0                   0                   0 
+  NumDealsPurchases     NumWebPurchases NumCatalogPurchases   NumStorePurchases   NumWebVisitsMonth 
+                  0                   0                   0                   0                   0 
+       AcceptedCmp3        AcceptedCmp4        AcceptedCmp5        AcceptedCmp1        AcceptedCmp2 
+                  0                   0                   0                   0                   0 
+           Complain       Z_CostContact           Z_Revenue            Response 
+                  0                   0                   0                   0 
+
+Checking uniqueness of customer IDs:
+Unique IDs: 2240 
+Total records: 2240 
+Result: No duplicate customer IDs detected.
+
+------------ EXPLORATORY DATA ANALYSIS ------------
+Total spending across product categories:
+        MntWines        MntFruits  MntMeatProducts  MntFishProducts MntSweetProducts 
+          680816            58917           373968            84057            60621 
+    MntGoldProds 
+           98609 
+
+Total transactions across purchase channels:
+  NumDealsPurchases     NumWebPurchases NumCatalogPurchases   NumStorePurchases   NumWebVisitsMonth 
+               5208                9150                5963               12970               11909 
+
+Summary of Age:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  30.00   49.00   56.00   57.19   67.00  133.00 
+
+Income group distribution:
+
+   0-30k  30k-60k  60k-90k 90k-120k    120k+     <NA> 
+     370     1005      788       45        8       24 
+
+Age group distribution:
+
+  (0,18]  (18,25]  (25,30]  (30,40]  (40,50]  (50,60]  (60,70]  (70,90] (90,Inf] 
+       0        0        2      187      506      685      492      365        3 
+
+Income-based consumer summary:
+# A tibble: 6 × 7
+  IncomeBins count AvgIncome AvgSpend AvgPurchases AvgRecency Response_Acpt_per
+  <fct>      <int>     <dbl>    <dbl>        <dbl>      <dbl>             <dbl>
+1 0-30k        370    21477.     72.2         7.36       50.0             10.5 
+2 30k-60k     1005    44524.    299.         12.7        48.7             11.2 
+3 60k-90k      788    72425.   1186.         20.9        49.1             19.7 
+4 90k-120k      45    94288.   1740.         21.2        46.0             57.8 
+5 120k+          8   221604.    662.         15.4        48.6              0   
+6 NA            24      NaN     488.         13.1        58.0              4.17
+
+Top 3 products within each income group:
+# A tibble: 17 × 3
+   IncomeBins HighestSpendProduct count
+   <fct>      <chr>               <int>
+ 1 0-30k      Gold                  116
+ 2 0-30k      Meat                   99
+ 3 0-30k      Wines                  97
+ 4 30k-60k    Wines                 794
+ 5 30k-60k    Meat                  133
+ 6 30k-60k    Gold                   50
+ 7 60k-90k    Wines                 596
+ 8 60k-90k    Meat                  188
+ 9 60k-90k    Fish                    3
+10 90k-120k   Wines                  31
+11 90k-120k   Meat                   13
+12 90k-120k   Sweets                  1
+13 120k+      Meat                    4
+14 120k+      Wines                   4
+15 NA         Wines                  17
+16 NA         Meat                    6
+17 NA         Gold                    1
+
+Age-group summary:
+# A tibble: 7 × 7
+  AgeBins  count AvgIncome AvgSpend AvgPurchases AvgRecency Response_Acpt_per
+  <fct>    <int>     <dbl>    <dbl>        <dbl>      <dbl>             <dbl>
+1 (25,30]      2    10960.      69          7          52.5              50  
+2 (30,40]    187    47905.     657.        13.4        46.6              16.6
+3 (40,50]    506    48058.     500.        13.2        49.3              15.2
+4 (50,60]    685    50479.     552.        14.5        48.3              15.5
+5 (60,70]    492    55980.     671.        16.1        50.8              12.4
+6 (70,90]    365    58767.     743.        16.9        49.4              15.9
+7 (90,Inf]     3    60118      647.         8.33       52.7               0  
+
+Top 3 products within each age group:
+# A tibble: 18 × 3
+   AgeBins  HighestSpendProduct count
+   <fct>    <chr>               <int>
+ 1 (25,30]  Gold                    2
+ 2 (30,40]  Wines                  84
+ 3 (30,40]  Meat                   58
+ 4 (30,40]  Gold                   31
+ 5 (40,50]  Wines                 295
+ 6 (40,50]  Meat                  123
+ 7 (40,50]  Gold                   51
+ 8 (50,60]  Wines                 485
+ 9 (50,60]  Meat                  127
+10 (50,60]  Gold                   57
+11 (60,70]  Wines                 378
+12 (60,70]  Meat                   80
+13 (60,70]  Gold                   18
+14 (70,90]  Wines                 295
+15 (70,90]  Meat                   55
+16 (70,90]  Gold                    8
+17 (90,Inf] Wines                   2
+18 (90,Inf] Gold                    1
+
+Education-level summary:
+# A tibble: 5 × 7
+  Education  count AvgIncome AvgSpend AvgPurchases AvgRecency Response_Acpt_per
+  <fct>      <int>     <dbl>    <dbl>        <dbl>      <dbl>             <dbl>
+1 2n Cycle     203    47633.    497.         13.8        48.4             10.8 
+2 Basic         54    20306.     81.8         7.02       48.4              3.70
+3 Graduation  1127    52720.    620.         15.0        50.0             13.5 
+4 Master       370    52918.    612.         14.9        47.6             15.4 
+5 PhD          486    56145.    672.         15.8        48.5             20.8 
+
+Top 3 products within each education group:
+# A tibble: 16 × 3
+   Education  HighestSpendProduct count
+   <fct>      <chr>               <int>
+ 1 2n Cycle   Wines                  95
+ 2 2n Cycle   Meat                   49
+ 3 2n Cycle   Gold                   40
+ 4 Basic      Gold                   27
+ 5 Basic      Fish                   14
+ 6 Basic      Fruits                  5
+ 7 Basic      Sweets                  5
+ 8 Graduation Wines                 730
+ 9 Graduation Meat                  272
+10 Graduation Gold                   80
+11 Master     Wines                 295
+12 Master     Meat                   60
+13 Master     Gold                   14
+14 PhD        Wines                 418
+15 PhD        Meat                   60
+16 PhD        Gold                    7
+
+Marital status summary:
+# A tibble: 8 × 7
+  Marital_Status count AvgIncome AvgSpend AvgPurchases AvgRecency Response_Acpt_per
+  <fct>          <int>     <dbl>    <dbl>        <dbl>      <dbl>             <dbl>
+1 Absurd             2    72366.    1192.         19.5       53                50  
+2 Alone              3    43789      257.         13.3       30.3              33.3
+3 Divorced         232    52834.     611.         15.2       49.5              20.7
+4 Married          864    51725.     591.         15.0       48.3              11.3
+5 Single           480    50995.     606.         14.2       49.5              22.1
+6 Together         580    53246.     608.         14.8       50.1              10.3
+7 Widow             77    56482.     739.         16.7       49.1              24.7
+8 YOLO               2    48432      424          19          3                50  
+
+Top 3 products within each marital status group:
+# A tibble: 21 × 3
+   Marital_Status HighestSpendProduct count
+   <fct>          <chr>               <int>
+ 1 Absurd         Meat                    1
+ 2 Absurd         Wines                   1
+ 3 Alone          Gold                    1
+ 4 Alone          Meat                    1
+ 5 Alone          Wines                   1
+ 6 Divorced       Wines                 166
+ 7 Divorced       Meat                   43
+ 8 Divorced       Gold                   15
+ 9 Married        Wines                 595
+10 Married        Meat                  165
+11 Married        Gold                   63
+12 Single         Wines                 309
+13 Single         Meat                  106
+14 Single         Gold                   47
+15 Together       Wines                 409
+16 Together       Meat                  109
+17 Together       Gold                   42
+18 Widow          Wines                  56
+19 Widow          Meat                   18
+20 Widow          Fish                    2
+21 YOLO           Wines                   2
+
+CAMPAIGN RESPONSE ANALYSIS
+Percentage acceptance across previous campaigns:
+AcceptedCmp1 AcceptedCmp2 AcceptedCmp3 AcceptedCmp4 AcceptedCmp5 
+        6.43         1.34         7.28         7.46         7.28 
+
+Summary of consumers by response to any previous campaign:
+# A tibble: 2 × 7
+  AcceptedAny count AvgIncome AvgSpend AvgPurchases AvgRecency Response_Acpt_per
+        <dbl> <int>     <dbl>    <dbl>        <dbl>      <dbl>             <dbl>
+1           0  1777    48849.     478.         13.9       49.3                 0
+2           1   463    65256.    1097.         18.7       48.2               100
+
+------------ VISUAL INSPECTION OF NUMERIC VARIABLES ------------
+Creating histograms for selected numeric variables...
+Creating boxplots for selected numeric variables...
+
+------------ CORRELATION ANALYSIS ------------
+Correlation matrix calculated.
+                    Income Kidhome Teenhome Recency MntWines MntFruits MntMeatProducts
+Income                1.00   -0.43     0.02    0.00     0.58      0.43            0.58
+Kidhome              -0.43    1.00    -0.04    0.01    -0.50     -0.37           -0.44
+Teenhome              0.02   -0.04     1.00    0.01     0.00     -0.18           -0.26
+Recency               0.00    0.01     0.01    1.00     0.02     -0.01            0.02
+MntWines              0.58   -0.50     0.00    0.02     1.00      0.39            0.57
+MntFruits             0.43   -0.37    -0.18   -0.01     0.39      1.00            0.55
+MntMeatProducts       0.58   -0.44    -0.26    0.02     0.57      0.55            1.00
+MntFishProducts       0.44   -0.39    -0.21    0.00     0.40      0.59            0.57
+MntSweetProducts      0.44   -0.38    -0.16    0.03     0.39      0.57            0.54
+MntGoldProds          0.33   -0.36    -0.02    0.02     0.39      0.40            0.36
+NumDealsPurchases    -0.08    0.22     0.39    0.00     0.01     -0.13           -0.12
+NumWebPurchases       0.39   -0.37     0.16   -0.01     0.55      0.30            0.31
+NumCatalogPurchases   0.59   -0.50    -0.11    0.02     0.63      0.49            0.73
+NumStorePurchases     0.53   -0.50     0.05    0.00     0.64      0.46            0.49
+NumWebVisitsMonth    -0.55    0.45     0.13   -0.02    -0.32     -0.42           -0.54
+AcceptedCmp3         -0.02    0.02    -0.04   -0.03     0.06      0.01            0.02
+AcceptedCmp4          0.18   -0.16     0.04    0.02     0.37      0.01            0.09
+AcceptedCmp5          0.34   -0.21    -0.19    0.00     0.47      0.21            0.38
+AcceptedCmp1          0.28   -0.17    -0.14   -0.02     0.35      0.19            0.31
+AcceptedCmp2          0.09   -0.08    -0.02    0.00     0.21     -0.01            0.04
+Complain             -0.03    0.04     0.00    0.01    -0.04     -0.01           -0.02
+Response              0.13   -0.08    -0.15   -0.20     0.25      0.12            0.24
+                    MntFishProducts MntSweetProducts MntGoldProds NumDealsPurchases NumWebPurchases
+Income                         0.44             0.44         0.33             -0.08            0.39
+Kidhome                       -0.39            -0.38        -0.36              0.22           -0.37
+Teenhome                      -0.21            -0.16        -0.02              0.39            0.16
+Recency                        0.00             0.03         0.02              0.00           -0.01
+MntWines                       0.40             0.39         0.39              0.01            0.55
+MntFruits                      0.59             0.57         0.40             -0.13            0.30
+MntMeatProducts                0.57             0.54         0.36             -0.12            0.31
+MntFishProducts                1.00             0.58         0.43             -0.14            0.30
+MntSweetProducts               0.58             1.00         0.36             -0.12            0.33
+MntGoldProds                   0.43             0.36         1.00              0.05            0.41
+NumDealsPurchases             -0.14            -0.12         0.05              1.00            0.24
+NumWebPurchases                0.30             0.33         0.41              0.24            1.00
+NumCatalogPurchases            0.53             0.50         0.44             -0.01            0.39
+NumStorePurchases              0.46             0.46         0.39              0.07            0.52
+NumWebVisitsMonth             -0.45            -0.42        -0.25              0.35           -0.05
+AcceptedCmp3                   0.00             0.00         0.12             -0.02            0.04
+AcceptedCmp4                   0.02             0.03         0.02              0.02            0.16
+AcceptedCmp5                   0.20             0.26         0.18             -0.18            0.14
+AcceptedCmp1                   0.26             0.25         0.17             -0.13            0.16
+AcceptedCmp2                   0.00             0.01         0.05             -0.04            0.03
+Complain                      -0.02            -0.02        -0.03              0.00           -0.02
+Response                       0.11             0.12         0.14              0.00            0.15
+                    NumCatalogPurchases NumStorePurchases NumWebVisitsMonth AcceptedCmp3
+Income                             0.59              0.53             -0.55        -0.02
+Kidhome                           -0.50             -0.50              0.45         0.02
+Teenhome                          -0.11              0.05              0.13        -0.04
+Recency                            0.02              0.00             -0.02        -0.03
+MntWines                           0.63              0.64             -0.32         0.06
+MntFruits                          0.49              0.46             -0.42         0.01
+MntMeatProducts                    0.73              0.49             -0.54         0.02
+MntFishProducts                    0.53              0.46             -0.45         0.00
+MntSweetProducts                   0.50              0.46             -0.42         0.00
+MntGoldProds                       0.44              0.39             -0.25         0.12
+NumDealsPurchases                 -0.01              0.07              0.35        -0.02
+NumWebPurchases                    0.39              0.52             -0.05         0.04
+NumCatalogPurchases                1.00              0.52             -0.52         0.10
+NumStorePurchases                  0.52              1.00             -0.43        -0.07
+NumWebVisitsMonth                 -0.52             -0.43              1.00         0.06
+AcceptedCmp3                       0.10             -0.07              0.06         1.00
+AcceptedCmp4                       0.14              0.18             -0.03        -0.08
+AcceptedCmp5                       0.32              0.21             -0.28         0.08
+AcceptedCmp1                       0.31              0.18             -0.19         0.10
+AcceptedCmp2                       0.10              0.09             -0.01         0.07
+Complain                          -0.02             -0.02              0.02         0.01
+Response                           0.22              0.04              0.00         0.25
+                    AcceptedCmp4 AcceptedCmp5 AcceptedCmp1 AcceptedCmp2 Complain Response
+Income                      0.18         0.34         0.28         0.09    -0.03     0.13
+Kidhome                    -0.16        -0.21        -0.17        -0.08     0.04    -0.08
+Teenhome                    0.04        -0.19        -0.14        -0.02     0.00    -0.15
+Recency                     0.02         0.00        -0.02         0.00     0.01    -0.20
+MntWines                    0.37         0.47         0.35         0.21    -0.04     0.25
+MntFruits                   0.01         0.21         0.19        -0.01    -0.01     0.12
+MntMeatProducts             0.09         0.38         0.31         0.04    -0.02     0.24
+MntFishProducts             0.02         0.20         0.26         0.00    -0.02     0.11
+MntSweetProducts            0.03         0.26         0.25         0.01    -0.02     0.12
+MntGoldProds                0.02         0.18         0.17         0.05    -0.03     0.14
+NumDealsPurchases           0.02        -0.18        -0.13        -0.04     0.00     0.00
+NumWebPurchases             0.16         0.14         0.16         0.03    -0.02     0.15
+NumCatalogPurchases         0.14         0.32         0.31         0.10    -0.02     0.22
+NumStorePurchases           0.18         0.21         0.18         0.09    -0.02     0.04
+NumWebVisitsMonth          -0.03        -0.28        -0.19        -0.01     0.02     0.00
+AcceptedCmp3               -0.08         0.08         0.10         0.07     0.01     0.25
+AcceptedCmp4                1.00         0.31         0.24         0.30    -0.03     0.18
+AcceptedCmp5                0.31         1.00         0.41         0.22    -0.01     0.32
+AcceptedCmp1                0.24         0.41         1.00         0.18    -0.03     0.30
+AcceptedCmp2                0.30         0.22         0.18         1.00    -0.01     0.17
+Complain                   -0.03        -0.01        -0.03        -0.01     1.00     0.00
+Response                    0.18         0.32         0.30         0.17     0.00     1.00
+
+------------ MISSING VALUE ANALYSIS ------------
+Number of missing Income values: 24 
+Summary of records with missing Income:
+       ID          Year_Birth        Education   Marital_Status     Income       Kidhome      
+ Min.   : 1295   Min.   :1943   2n Cycle  : 3   Single  :9      Min.   : NA   Min.   :0.0000  
+ 1st Qu.: 3063   1st Qu.:1958   Basic     : 0   Married :7      1st Qu.: NA   1st Qu.:0.0000  
+ Median : 5526   Median :1970   Graduation:11   Together:7      Median : NA   Median :1.0000  
+ Mean   : 5944   Mean   :1967   Master    : 5   Widow   :1      Mean   :NaN   Mean   :0.6667  
+ 3rd Qu.: 8598   3rd Qu.:1974   PhD       : 5   Absurd  :0      3rd Qu.: NA   3rd Qu.:1.0000  
+ Max.   :10629   Max.   :1989                   Alone   :0      Max.   : NA   Max.   :2.0000  
+                                                (Other) :0      NA's   :24                    
+    Teenhome       Dt_Customer            Recency         MntWines       MntFruits     
+ Min.   :0.0000   Min.   :2012-08-12   Min.   : 4.00   Min.   :  5.0   Min.   :  0.00  
+ 1st Qu.:0.0000   1st Qu.:2013-03-24   1st Qu.:35.50   1st Qu.: 22.0   1st Qu.:  1.00  
+ Median :1.0000   Median :2013-07-02   Median :62.00   Median : 76.0   Median :  3.50  
+ Mean   :0.5833   Mean   :2013-07-04   Mean   :58.04   Mean   :197.2   Mean   : 21.33  
+ 3rd Qu.:1.0000   3rd Qu.:2013-11-07   3rd Qu.:82.25   3rd Qu.:286.0   3rd Qu.: 24.25  
+ Max.   :2.0000   Max.   :2014-05-27   Max.   :96.00   Max.   :861.0   Max.   :138.00  
+                                                                                       
+ MntMeatProducts  MntFishProducts  MntSweetProducts  MntGoldProds    NumDealsPurchases
+ Min.   :   3.0   Min.   :  0.00   Min.   :  0.00   Min.   :  1.00   Min.   : 0.000   
+ 1st Qu.:  14.5   1st Qu.:  2.00   1st Qu.:  1.50   1st Qu.:  6.75   1st Qu.: 1.000   
+ Median :  35.0   Median :  8.00   Median :  4.00   Median : 17.50   Median : 1.500   
+ Mean   : 162.7   Mean   : 27.17   Mean   : 30.21   Mean   : 49.25   Mean   : 2.458   
+ 3rd Qu.: 177.0   3rd Qu.: 40.75   3rd Qu.: 31.75   3rd Qu.: 55.00   3rd Qu.: 3.000   
+ Max.   :1607.0   Max.   :164.00   Max.   :263.00   Max.   :362.00   Max.   :12.000   
+                                                                                      
+ NumWebPurchases  NumCatalogPurchases NumStorePurchases NumWebVisitsMonth  AcceptedCmp3
+ Min.   : 0.000   Min.   : 0.000      Min.   : 0.000    Min.   :0.000     Min.   :0    
+ 1st Qu.: 1.000   1st Qu.: 0.000      1st Qu.: 3.000    1st Qu.:3.000     1st Qu.:0    
+ Median : 2.500   Median : 1.000      Median : 4.000    Median :6.000     Median :0    
+ Mean   : 4.042   Mean   : 1.833      Mean   : 4.792    Mean   :5.083     Mean   :0    
+ 3rd Qu.: 5.250   3rd Qu.: 3.000      3rd Qu.: 7.000    3rd Qu.:7.000     3rd Qu.:0    
+ Max.   :27.000   Max.   :10.000      Max.   :12.000    Max.   :9.000     Max.   :0    
+                                                                                       
+  AcceptedCmp4    AcceptedCmp5      AcceptedCmp1      AcceptedCmp2    Complain Z_CostContact
+ Min.   :0.000   Min.   :0.00000   Min.   :0.00000   Min.   :0     Min.   :0   Min.   :3    
+ 1st Qu.:0.000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0     1st Qu.:0   1st Qu.:3    
+ Median :0.000   Median :0.00000   Median :0.00000   Median :0     Median :0   Median :3    
+ Mean   :0.125   Mean   :0.04167   Mean   :0.08333   Mean   :0     Mean   :0   Mean   :3    
+ 3rd Qu.:0.000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0     3rd Qu.:0   3rd Qu.:3    
+ Max.   :1.000   Max.   :1.00000   Max.   :1.00000   Max.   :0     Max.   :0   Max.   :3    
+                                                                                            
+   Z_Revenue     Response         TotalSpend      TotalPurchases  HighestSpendProduct
+ Min.   :11   Min.   :0.00000   Min.   :  18.00   Min.   : 1.00   Length:24          
+ 1st Qu.:11   1st Qu.:0.00000   1st Qu.:  46.75   1st Qu.: 6.50   Class :character   
+ Median :11   Median :0.00000   Median : 262.00   Median :10.50   Mode  :character   
+ Mean   :11   Mean   :0.04167   Mean   : 487.88   Mean   :13.12                      
+ 3rd Qu.:11   3rd Qu.:0.00000   3rd Qu.: 722.00   3rd Qu.:19.50                      
+ Max.   :11   Max.   :1.00000   Max.   :1679.00   Max.   :29.00                      
+                                                                                     
+      Age           IncomeBins    AgeBins   AcceptedAny    
+ Min.   :37.00   0-30k   : 0   (50,60]:7   Min.   :0.0000  
+ 1st Qu.:51.75   30k-60k : 0   (60,70]:7   1st Qu.:0.0000  
+ Median :56.50   60k-90k : 0   (40,50]:4   Median :0.0000  
+ Mean   :58.54   90k-120k: 0   (70,90]:4   Mean   :0.1667  
+ 3rd Qu.:68.25   120k+   : 0   (30,40]:2   3rd Qu.:0.0000  
+ Max.   :83.00   NA's    :24   (0,18] :0   Max.   :1.0000  
+                               (Other):0                   
+
+------------ TRAIN-TEST SPLIT ------------
+Target variable distribution before split:
+
+        0         1 
+0.7933036 0.2066964 
+
+Training set size  : 1568 
+Testing set size   : 672 
+
+Target variable distribution in training data:
+
+        0         1 
+0.7959184 0.2040816 
+
+Target variable distribution in testing data:
+
+        0         1 
+0.7872024 0.2127976 
+
+Training data summary:
+      Education    Marital_Status     Income          Kidhome          Teenhome         Recency     
+ 2n Cycle  :148   Married :610    Min.   :  1730   Min.   :0.0000   Min.   :0.0000   Min.   : 0.00  
+ Basic     : 42   Together:415    1st Qu.: 34941   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:24.00  
+ Graduation:796   Single  :323    Median : 50737   Median :0.0000   Median :0.0000   Median :49.00  
+ Master    :249   Divorced:163    Mean   : 51568   Mean   :0.4477   Mean   :0.5057   Mean   :48.81  
+ PhD       :333   Widow   : 53    3rd Qu.: 68092   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:74.00  
+                  Alone   :  2    Max.   :162397   Max.   :2.0000   Max.   :2.0000   Max.   :99.00  
+                  (Other) :  2    NA's   :15                                                        
+    MntWines        MntFruits     MntMeatProducts  MntFishProducts  MntSweetProducts
+ Min.   :   0.0   Min.   :  0.0   Min.   :   1.0   Min.   :  0.00   Min.   :  0.00  
+ 1st Qu.:  25.0   1st Qu.:  1.0   1st Qu.:  16.0   1st Qu.:  3.00   1st Qu.:  1.00  
+ Median : 172.0   Median :  8.0   Median :  67.0   Median : 12.00   Median :  8.00  
+ Mean   : 300.1   Mean   : 26.4   Mean   : 163.7   Mean   : 37.49   Mean   : 26.31  
+ 3rd Qu.: 495.2   3rd Qu.: 32.0   3rd Qu.: 217.0   3rd Qu.: 50.00   3rd Qu.: 32.00  
+ Max.   :1486.0   Max.   :199.0   Max.   :1725.0   Max.   :259.00   Max.   :196.00  
+                                                                                    
+  MntGoldProds    NumDealsPurchases NumWebPurchases  NumCatalogPurchases NumStorePurchases
+ Min.   :  0.00   Min.   : 0.000    Min.   : 0.000   Min.   : 0.000      Min.   : 0.000   
+ 1st Qu.:  9.00   1st Qu.: 1.000    1st Qu.: 2.000   1st Qu.: 0.000      1st Qu.: 3.000   
+ Median : 25.00   Median : 2.000    Median : 4.000   Median : 2.000      Median : 5.000   
+ Mean   : 44.11   Mean   : 2.381    Mean   : 4.066   Mean   : 2.642      Mean   : 5.792   
+ 3rd Qu.: 56.25   3rd Qu.: 3.000    3rd Qu.: 6.000   3rd Qu.: 4.000      3rd Qu.: 8.000   
+ Max.   :321.00   Max.   :15.000    Max.   :25.000   Max.   :28.000      Max.   :13.000   
+                                                                                          
+ NumWebVisitsMonth  AcceptedCmp3      AcceptedCmp4      AcceptedCmp5      AcceptedCmp1    
+ Min.   : 0.000    Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.00000  
+ 1st Qu.: 4.000    1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000  
+ Median : 6.000    Median :0.00000   Median :0.00000   Median :0.00000   Median :0.00000  
+ Mean   : 5.386    Mean   :0.07462   Mean   :0.07015   Mean   :0.06888   Mean   :0.06314  
+ 3rd Qu.: 7.000    3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000  
+ Max.   :20.000    Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   Max.   :1.00000  
+                                                                                          
+  AcceptedCmp2        Complain          TotalSpend     TotalPurchases  HighestSpendProduct
+ Min.   :0.00000   Min.   :0.000000   Min.   :   5.0   Min.   : 0.00   Length:1568        
+ 1st Qu.:0.00000   1st Qu.:0.000000   1st Qu.:  68.0   1st Qu.: 8.00   Class :character   
+ Median :0.00000   Median :0.000000   Median : 396.5   Median :15.00   Mode  :character   
+ Mean   :0.01339   Mean   :0.009566   Mean   : 598.1   Mean   :14.88                      
+ 3rd Qu.:0.00000   3rd Qu.:0.000000   3rd Qu.:1033.0   3rd Qu.:21.00                      
+ Max.   :1.00000   Max.   :1.000000   Max.   :2525.0   Max.   :44.00                      
+                                                                                          
+      Age            IncomeBins     AgeBins     AcceptedAny    
+ Min.   : 30.00   0-30k   :267   (50,60]:493   Min.   :0.0000  
+ 1st Qu.: 48.00   30k-60k :709   (40,50]:358   1st Qu.:0.0000  
+ Median : 56.00   60k-90k :543   (60,70]:339   Median :0.0000  
+ Mean   : 56.94   90k-120k: 29   (70,90]:246   Mean   :0.2041  
+ 3rd Qu.: 66.00   120k+   :  5   (30,40]:130   3rd Qu.:0.0000  
+ Max.   :126.00   NA's    : 15   (25,30]:  1   Max.   :1.0000  
+                                 (Other):  1                   
+
+------------ INCOME IMPUTATION ------------
+Median income used for imputation: 50737 
+
+Summary of imputed training income:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1730   35192   50737   51560   67760  162397 
+
+Missing Income values after imputation:
+Training data: 0 
+Testing data : 0 
+
+------------ PCA FOR SPENDING VARIABLES ------------
+PCA completed successfully.
+
+PCA summary:
+Importance of components:
+                          PC1    PC2    PC3     PC4    PC5     PC6
+Standard deviation     1.8326 0.8738 0.8327 0.65059 0.6411 0.59205
+Proportion of Variance 0.5597 0.1273 0.1155 0.07054 0.0685 0.05842
+Cumulative Proportion  0.5597 0.6870 0.8025 0.87308 0.9416 1.00000
+
+Proportion of variance explained by first 3 components:
+    PC1     PC2     PC3 
+0.55972 0.12726 0.11555 
+
+First 3 principal components extracted for clustering.
+
+------------ CLUSTERING ANALYSIS ------------
+Preparing clustering dataset...
+Variables used for clustering:
+ [1] "Age"                 "Education"           "Marital_Status"      "IncomeImp"          
+ [5] "Kidhome"             "Teenhome"            "Recency"             "NumDealsPurchases"  
+ [9] "NumWebPurchases"     "NumCatalogPurchases" "NumStorePurchases"   "NumWebVisitsMonth"  
+[13] "Complain"           
+
+Dimensions after dummy variable creation:
+[1] 1568   22
+
+Dimensions after adding PCA components:
+[1] 1568   25
+Within-cluster sum of squares for k = 2 to 10:
+   k          WSS
+1  2 228840953745
+2  3 128937642616
+3  4  87264851238
+4  5  56826741310
+5  6  37005489697
+6  7  27475835513
+7  8  20876533417
+8  9  16061903756
+9 10  12588888094
+
+K-means clustering completed.
+Cluster sizes:
+
+  1   2   3   4 
+360 456 267 485 
+
+Cluster centers:
+       Age IncomeImp   Kidhome  Teenhome  Recency NumDealsPurchases NumWebPurchases
+1 51.89444  24086.68 0.7750000 0.2222222 46.53056          1.975000        1.958333
+2 60.06360  63424.20 0.2039474 0.7127193 48.59430          2.804825        5.627193
+3 56.99251  82872.22 0.0823970 0.2134831 50.13109          1.318352        5.247191
+4 57.71546  43559.49 0.6350515 0.6824742 49.98763          2.870103        3.513402
+  NumCatalogPurchases NumStorePurchases NumWebVisitsMonth    Complain Marital_Status_Alone
+1           0.3972222          2.944444          7.091667 0.005555556          0.000000000
+2           3.7631579          8.070175          4.581140 0.008771930          0.002192982
+3           6.2209738          8.217228          2.756554 0.003745318          0.000000000
+4           1.2845361          4.428866          6.325773 0.016494845          0.002061856
+  Marital_Status_Divorced Marital_Status_Married Marital_Status_Single Marital_Status_Together
+1              0.09166667              0.3888889             0.2277778               0.2694444
+2              0.11403509              0.4100877             0.1754386               0.2631579
+3              0.09363296              0.3895131             0.2022472               0.2771536
+4              0.10927835              0.3690722             0.2206186               0.2556701
+  Marital_Status_Widow Marital_Status_YOLO Education_Basic Education_Graduation Education_Master
+1           0.02222222         0.000000000     0.113888889            0.5111111        0.1166667
+2           0.03289474         0.000000000     0.000000000            0.5219298        0.1578947
+3           0.03745318         0.000000000     0.000000000            0.5243446        0.1647940
+4           0.04123711         0.002061856     0.002061856            0.4824742        0.1876289
+  Education_PhD        PC1         PC2         PC3
+1     0.1138889  1.4518484  0.32350025  0.15251690
+2     0.2478070 -0.7524110 -0.29189573 -0.01695521
+3     0.2284644 -2.4828028  0.01508145 -0.44113382
+4     0.2432990  0.9965822  0.02601571  0.14558397
+
+Average silhouette width:
+[1] 0.5291716
+
+Cluster profile summary:
+# A tibble: 4 × 12
+  cluster   Age IncomeImp Kidhome Teenhome Recency NumDealsPurchases NumWebPurchases
+    <int> <dbl>     <dbl>   <dbl>    <dbl>   <dbl>             <dbl>           <dbl>
+1       1  51.9    24087.  0.775     0.222    46.5              1.98            1.96
+2       2  60.1    63424.  0.204     0.713    48.6              2.80            5.63
+3       3  57.0    82872.  0.0824    0.213    50.1              1.32            5.25
+4       4  57.7    43559.  0.635     0.682    50.0              2.87            3.51
+# ℹ 4 more variables: NumCatalogPurchases <dbl>, NumStorePurchases <dbl>, NumWebVisitsMonth <dbl>,
+#   Complain <dbl>
+
+Most common education level by cluster:
+# A tibble: 4 × 3
+  cluster Education  count
+    <int> <fct>      <int>
+1       1 Graduation   184
+2       2 Graduation   238
+3       3 Graduation   140
+4       4 Graduation   234
+
+Most common marital status by cluster:
+# A tibble: 4 × 3
+  cluster Marital_Status count
+    <int> <fct>          <int>
+1       1 Married          140
+2       2 Married          187
+3       3 Married          104
+4       4 Married          179
+
+Campaign Acceptance across clusters:
+# A tibble: 4 × 7
+  cluster   cmp1    cmp2   cmp3    cmp4    cmp5 cmpAny
+    <int>  <dbl>   <dbl>  <dbl>   <dbl>   <dbl>  <dbl>
+1       1 0      0       0.0806 0.00278 0       0.0833
+2       2 0.0526 0.0219  0.0417 0.101   0.0351  0.189 
+3       3 0.262  0.0337  0.105  0.146   0.337   0.517 
+4       4 0.0103 0.00412 0.0845 0.0495  0.00412 0.136 
+
+-------ANOVA: Income vs Cluster -------
+                     Df       Sum Sq      Mean Sq F value              Pr(>F)    
+as.factor(cluster)    3 628733636995 209577878998    3756 <0.0000000000000002 ***
+Residuals          1564  87263289561     55794942                                
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+----- Chi-Square: Cluster vs Education -------
+   
+    2n Cycle Basic Graduation Master PhD
+  1       52    41        184     42  41
+  2       33     0        238     72 113
+  3       22     0        140     44  61
+  4       41     1        234     91 118
+
+	Pearson's Chi-squared test
+
+data:  table_edu
+X-squared = 174.42, df = 12, p-value < 0.00000000000000022
+
+
+------- Chi-Square: Cluster vs AcceptedAny -------
+   
+      0   1
+  1 330  30
+  2 370  86
+  3 129 138
+  4 419  66
+
+	Pearson's Chi-squared test
+
+data:  table_resp
+X-squared = 207.6, df = 3, p-value < 0.00000000000000022
+
+
+Average Response Rate by Cluster:
+  cluster AcceptedAny
+1       1  0.08333333
+2       2  0.18859649
+3       3  0.51685393
+4       4  0.13608247
+
+Logistic Regression: Cluster Predicting Response 
+
+Call:
+glm(formula = AcceptedAny ~ as.factor(cluster), family = "binomial", 
+    data = train_data)
+
+Coefficients:
+                    Estimate Std. Error z value             Pr(>|z|)    
+(Intercept)          -2.3979     0.1907 -12.575 < 0.0000000000000002 ***
+as.factor(cluster)2   0.9387     0.2252   4.169            0.0000306 ***
+as.factor(cluster)3   2.4653     0.2266  10.878 < 0.0000000000000002 ***
+as.factor(cluster)4   0.5497     0.2322   2.368               0.0179 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1586.8  on 1567  degrees of freedom
+Residual deviance: 1403.8  on 1564  degrees of freedom
+AIC: 1411.8
+
+Number of Fisher Scoring iterations: 5
+
+
+------------ASSOCIATION ANALYSIS-----------------Dimensions of association dataset:
+[1] 1568   16
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport maxtime support minlen maxlen target  ext
+        0.3    0.1    1 none FALSE            TRUE       5    0.01      2     10  rules TRUE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 15 
+
+set item appearances ...[6 item(s)] done [0.00s].
+set transactions ...[32 item(s), 1568 transaction(s)] done [0.00s].
+sorting and recoding items ... [30 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 4 5 6 7 8 9 10 done [0.44s].
+writing ... [5325 rule(s)] done [0.04s].
+creating S4 object  ... done [0.02s].
+
+Number of campaign-related rules:
+[1] 5325
+
+Top rules:
+     lhs                     rhs                   support confidence   coverage     lift count
+[1]  {AcceptedCmp3=No,                                                                         
+      Buy_Fish=No,                                                                             
+      Web_Buyer=Yes,                                                                           
+      Catalog_Buyer=Yes}  => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[2]  {AcceptedCmp3=No,                                                                         
+      Buy_Fish=No,                                                                             
+      Catalog_Buyer=Yes,                                                                       
+      Store_Buyer=Yes}    => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[3]  {AcceptedCmp3=No,                                                                         
+      Buy_Wine=Yes,                                                                            
+      Buy_Fish=No,                                                                             
+      Web_Buyer=Yes,                                                                           
+      Catalog_Buyer=Yes}  => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[4]  {AcceptedCmp3=No,                                                                         
+      Buy_Fish=No,                                                                             
+      Web_Buyer=Yes,                                                                           
+      Catalog_Buyer=Yes,                                                                       
+      Store_Buyer=Yes}    => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[5]  {AcceptedCmp3=No,                                                                         
+      Buy_Meat=Yes,                                                                            
+      Buy_Fish=No,                                                                             
+      Web_Buyer=Yes,                                                                           
+      Catalog_Buyer=Yes}  => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[6]  {AcceptedCmp3=No,                                                                         
+      Buy_Wine=Yes,                                                                            
+      Buy_Fish=No,                                                                             
+      Catalog_Buyer=Yes,                                                                       
+      Store_Buyer=Yes}    => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[7]  {AcceptedCmp3=No,                                                                         
+      Buy_Meat=Yes,                                                                            
+      Buy_Fish=No,                                                                             
+      Catalog_Buyer=Yes,                                                                       
+      Store_Buyer=Yes}    => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[8]  {AcceptedCmp3=No,                                                                         
+      Buy_Wine=Yes,                                                                            
+      Buy_Fish=No,                                                                             
+      Web_Buyer=Yes,                                                                           
+      Catalog_Buyer=Yes,                                                                       
+      Store_Buyer=Yes}    => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[9]  {AcceptedCmp3=No,                                                                         
+      Buy_Wine=Yes,                                                                            
+      Buy_Meat=Yes,                                                                            
+      Buy_Fish=No,                                                                             
+      Web_Buyer=Yes,                                                                           
+      Catalog_Buyer=Yes}  => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+[10] {AcceptedCmp3=No,                                                                         
+      Buy_Meat=Yes,                                                                            
+      Buy_Fish=No,                                                                             
+      Web_Buyer=Yes,                                                                           
+      Catalog_Buyer=Yes,                                                                       
+      Store_Buyer=Yes}    => {AcceptedCmp4=Yes} 0.01530612  0.3636364 0.04209184 5.183471    24
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport maxtime support minlen maxlen target  ext
+        0.2    0.1    1 none FALSE            TRUE       5   0.005      2      3  rules TRUE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 7 
+
+set item appearances ...[16 item(s)] done [0.00s].
+set transactions ...[16 item(s), 1568 transaction(s)] done [0.00s].
+sorting and recoding items ... [16 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 done [0.00s].
+writing ... [42 rule(s)] done [0.00s].
+creating S4 object  ... done [0.00s].
+Number of rules:
+[1] 42
+
+Top rules:
+     lhs                                     rhs               support   confidence coverage 
+[1]  {Web_Buyer=Yes, Catalog_Buyer=Yes}   => {AcceptedAny=Yes} 0.1639031 0.3228643  0.5076531
+[2]  {Catalog_Buyer=Yes, Store_Buyer=Yes} => {AcceptedAny=Yes} 0.1645408 0.3204969  0.5133929
+[3]  {Buy_Wine=Yes, Catalog_Buyer=Yes}    => {AcceptedAny=Yes} 0.1645408 0.3197026  0.5146684
+[4]  {Catalog_Buyer=Yes}                  => {AcceptedAny=Yes} 0.1645408 0.3193069  0.5153061
+[5]  {Buy_Wine=Yes, Web_Buyer=Yes}        => {AcceptedAny=Yes} 0.1875000 0.2307692  0.8125000
+[6]  {Web_Buyer=Yes, Store_Buyer=Yes}     => {AcceptedAny=Yes} 0.1875000 0.2293292  0.8176020
+[7]  {Web_Buyer=Yes}                      => {AcceptedAny=Yes} 0.1875000 0.2291504  0.8182398
+[8]  {Buy_Fruits=Yes, Buy_Sweet=Yes}      => {AcceptedAny=Yes} 0.1409439 0.2173058  0.6485969
+[9]  {Buy_Wine=Yes, Buy_Fruits=Yes}       => {AcceptedAny=Yes} 0.1575255 0.2155323  0.7308673
+[10] {Buy_Fruits=Yes, Buy_Gold=Yes}       => {AcceptedAny=Yes} 0.1568878 0.2146597  0.7308673
+     lift     count
+[1]  1.582035 257  
+[2]  1.570435 258  
+[3]  1.566543 258  
+[4]  1.564604 258  
+[5]  1.130769 294  
+[6]  1.123713 294  
+[7]  1.122837 294  
+[8]  1.064798 221  
+[9]  1.056108 247  
+[10] 1.051832 246  
+
+------------REGRESSION ANALYSIS-----------------
+Full regression model fitted successfully.
+
+Regression model summary:
+
+Call:
+lm(formula = TotalPurchases ~ ., data = reg_train)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.42539 -0.06566 -0.00456  0.06768  0.35855 
+
+Coefficients:
+                        Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)             0.092481   0.105109   0.880               0.3791    
+Age                    -0.006851   0.024351  -0.281               0.7785    
+EducationBasic         -0.015984   0.018448  -0.866               0.3864    
+EducationGraduation    -0.010501   0.009306  -1.128               0.2594    
+EducationMaster        -0.008329   0.010999  -0.757               0.4490    
+EducationPhD           -0.005824   0.010763  -0.541               0.5885    
+Marital_StatusAlone     0.069849   0.126277   0.553               0.5802    
+Marital_StatusDivorced  0.057314   0.103542   0.554               0.5800    
+Marital_StatusMarried   0.066786   0.103325   0.646               0.5181    
+Marital_StatusSingle    0.052542   0.103415   0.508               0.6115    
+Marital_StatusTogether  0.055374   0.103365   0.536               0.5922    
+Marital_StatusWidow     0.052469   0.104122   0.504               0.6144    
+Marital_StatusYOLO      0.120229   0.146011   0.823               0.4104    
+IncomeImp               0.348519   0.040110   8.689 < 0.0000000000000002 ***
+Kidhome                -0.026635   0.012119  -2.198               0.0281 *  
+Teenhome                0.121116   0.011382  10.641 < 0.0000000000000002 ***
+Recency                -0.002502   0.008895  -0.281               0.7785    
+NumWebVisitsMonth       0.241674   0.030408   7.948  0.00000000000000363 ***
+Complain                0.001983   0.026851   0.074               0.9412    
+PC1                    -0.056889   0.002574 -22.097 < 0.0000000000000002 ***
+PC2                    -0.040438   0.003288 -12.299 < 0.0000000000000002 ***
+PC3                    -0.016608   0.003559  -4.666  0.00000333674344892 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1027 on 1546 degrees of freedom
+Multiple R-squared:  0.6565,	Adjusted R-squared:  0.6518 
+F-statistic: 140.7 on 21 and 1546 DF,  p-value: < 0.00000000000000022
+
+
+Applying stepwise variable selection to simplify the regression model...
+Stepwise regression model completed.
+
+Stepwise regression model summary:
+
+Call:
+lm(formula = TotalPurchases ~ IncomeImp + Kidhome + Teenhome + 
+    NumWebVisitsMonth + PC1 + PC2 + PC3, data = reg_train)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.43149 -0.06596 -0.00510  0.06620  0.36214 
+
+Coefficients:
+                   Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)        0.137254   0.016954   8.096  0.00000000000000114 ***
+IncomeImp          0.356475   0.039113   9.114 < 0.0000000000000002 ***
+Kidhome           -0.026191   0.011924  -2.196               0.0282 *  
+Teenhome           0.120182   0.010622  11.314 < 0.0000000000000002 ***
+NumWebVisitsMonth  0.244640   0.030171   8.108  0.00000000000000103 ***
+PC1               -0.056413   0.002545 -22.165 < 0.0000000000000002 ***
+PC2               -0.040242   0.003249 -12.385 < 0.0000000000000002 ***
+PC3               -0.016519   0.003443  -4.797  0.00000176215060545 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1025 on 1560 degrees of freedom
+Multiple R-squared:  0.6546,	Adjusted R-squared:  0.6531 
+F-statistic: 422.4 on 7 and 1560 DF,  p-value: < 0.00000000000000022
+
+Test Performance (Clean Model):
+RMSE: 8.628804 
+MAE : 4.375636 
+Correlation: 0.4391012 
+R-squared: 0.1928099 
+
+------------CLASSIFICATION MODEL-----------------
+-----------------Logistic Regression--------------
+
+Call:
+glm(formula = AcceptedAny ~ ., family = "binomial", data = train_balanced)
+
+Coefficients:
+                          Estimate  Std. Error z value             Pr(>|z|)    
+(Intercept)            -1.37986579  0.44913389  -3.072             0.002124 ** 
+Age                    -0.00549674  0.00450352  -1.221             0.222259    
+EducationBasic          0.28847655  0.45181893   0.638             0.523162    
+EducationGraduation    -0.18323345  0.21442514  -0.855             0.392809    
+EducationMaster        -0.50197050  0.25102416  -2.000             0.045534 *  
+EducationPhD            0.16170325  0.23918362   0.676             0.499000    
+Marital_StatusMarried   0.34652949  0.19559680   1.772             0.076452 .  
+Marital_StatusOther     2.17726586  0.96341445   2.260             0.023825 *  
+Marital_StatusSingle    0.33273280  0.21628615   1.538             0.123953    
+Marital_StatusTogether  0.45826579  0.20502576   2.235             0.025407 *  
+Marital_StatusWidow     0.63928822  0.38968315   1.641             0.100894    
+IncomeImp               0.00001814  0.00000340   5.337 0.000000094458164011 ***
+Kidhome                -0.31936393  0.11918049  -2.680             0.007370 ** 
+Teenhome               -0.42283575  0.10136499  -4.171 0.000030270980511485 ***
+Recency                -0.00162990  0.00168773  -0.966             0.334179    
+NumDealsPurchases      -0.01671039  0.02930538  -0.570             0.568531    
+NumWebPurchases         0.01708361  0.01991720   0.858             0.391041    
+NumCatalogPurchases     0.11643202  0.02198977   5.295 0.000000119129181919 ***
+NumStorePurchases      -0.04926568  0.01810584  -2.721             0.006509 ** 
+NumWebVisitsMonth       0.12271912  0.02528339   4.854 0.000001211518514280 ***
+Complain               -0.65039673  0.56078776  -1.160             0.246134    
+PC1                    -0.11200725  0.03483433  -3.215             0.001303 ** 
+PC2                    -0.46210250  0.05722628  -8.075 0.000000000000000675 ***
+PC3                    -0.20368656  0.05364210  -3.797             0.000146 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2173.7  on 1567  degrees of freedom
+Residual deviance: 1765.6  on 1544  degrees of freedom
+AIC: 1813.6
+
+Number of Fisher Scoring iterations: 4
+
+
+Confusion Matrix - Logistic Regression
+Confusion Matrix and Statistics
+
+          Reference
+Prediction  No Yes
+       No  399  42
+       Yes 130 101
+                                          
+               Accuracy : 0.744           
+                 95% CI : (0.7093, 0.7767)
+    No Information Rate : 0.7872          
+    P-Value [Acc > NIR] : 0.9968          
+                                          
+                  Kappa : 0.3761          
+                                          
+ Mcnemar's Test P-Value : 0.00000000003274
+                                          
+            Sensitivity : 0.7063          
+            Specificity : 0.7543          
+         Pos Pred Value : 0.4372          
+         Neg Pred Value : 0.9048          
+             Prevalence : 0.2128          
+         Detection Rate : 0.1503          
+   Detection Prevalence : 0.3438          
+      Balanced Accuracy : 0.7303          
+                                          
+       'Positive' Class : Yes             
+                                          
+GLM AUC: 0.7762502 
+
+-----------------Decision Tree Model--------------
+n= 1568 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 1568 780 Yes (0.4974490 0.5025510)  
+   2) PC3>=-1.176459 1333 586 No (0.5603901 0.4396099)  
+     4) NumCatalogPurchases< 5.873503 1073 392 No (0.6346692 0.3653308)  
+       8) PC2>=-0.9133331 896 279 No (0.6886161 0.3113839)  
+        16) PC3>=-0.646044 789 223 No (0.7173638 0.2826362)  
+          32) PC3< 0.6565608 614 145 No (0.7638436 0.2361564) *
+          33) PC3>=0.6565608 175  78 No (0.5542857 0.4457143)  
+            66) NumStorePurchases>=4.705823 89  25 No (0.7191011 0.2808989) *
+            67) NumStorePurchases< 4.705823 86  33 Yes (0.3837209 0.6162791) *
+        17) PC3< -0.646044 107  51 Yes (0.4766355 0.5233645)  
+          34) Age>=70.44556 18   3 No (0.8333333 0.1666667) *
+          35) Age< 70.44556 89  36 Yes (0.4044944 0.5955056) *
+       9) PC2< -0.9133331 177  64 Yes (0.3615819 0.6384181) *
+     5) NumCatalogPurchases>=5.873503 260  66 Yes (0.2538462 0.7461538) *
+   3) PC3< -1.176459 235  33 Yes (0.1404255 0.8595745) *
+
+Classification tree:
+rpart(formula = AcceptedAny ~ ., data = train_balanced, method = "class")
+
+Variables actually used in tree construction:
+[1] Age                 NumCatalogPurchases NumStorePurchases   PC2                
+[5] PC3                
+
+Root node error: 780/1568 = 0.49745
+
+n= 1568 
+
+        CP nsplit rel error  xerror     xstd
+1 0.206410      0   1.00000 1.02436 0.025379
+2 0.164103      1   0.79359 0.85000 0.025079
+3 0.062821      2   0.62949 0.76538 0.024651
+4 0.011859      3   0.56667 0.67179 0.023947
+5 0.010000      7   0.51923 0.62051 0.023451
+
+Confusion Matrix - Decision Tree:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction  No Yes
+       No  403  44
+       Yes 126  99
+                                          
+               Accuracy : 0.747           
+                 95% CI : (0.7124, 0.7795)
+    No Information Rate : 0.7872          
+    P-Value [Acc > NIR] : 0.9945          
+                                          
+                  Kappa : 0.3756          
+                                          
+ Mcnemar's Test P-Value : 0.0000000005218 
+                                          
+            Sensitivity : 0.6923          
+            Specificity : 0.7618          
+         Pos Pred Value : 0.4400          
+         Neg Pred Value : 0.9016          
+             Prevalence : 0.2128          
+         Detection Rate : 0.1473          
+   Detection Prevalence : 0.3348          
+      Balanced Accuracy : 0.7271          
+                                          
+       'Positive' Class : Yes             
+                                          
+Tree AUC: 0.7333668 
+
+-----------------Random Forest Model--------------
+
+Random Forest Model:
+
+Call:
+ randomForest(formula = AcceptedAny ~ ., data = train_balanced,      ) 
+               Type of random forest: classification
+                     Number of trees: 500
+No. of variables tried at each split: 4
+
+        OOB estimate of  error rate: 25.45%
+Confusion matrix:
+     No Yes class.error
+No  572 208   0.2666667
+Yes 191 597   0.2423858
+
+Confusion Matrix - Random Forest:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction  No Yes
+       No  411  48
+       Yes 118  95
+                                          
+               Accuracy : 0.753           
+                 95% CI : (0.7186, 0.7852)
+    No Information Rate : 0.7872          
+    P-Value [Acc > NIR] : 0.9855          
+                                          
+                  Kappa : 0.3744          
+                                          
+ Mcnemar's Test P-Value : 0.00000008535   
+                                          
+            Sensitivity : 0.6643          
+            Specificity : 0.7769          
+         Pos Pred Value : 0.4460          
+         Neg Pred Value : 0.8954          
+             Prevalence : 0.2128          
+         Detection Rate : 0.1414          
+   Detection Prevalence : 0.3170          
+      Balanced Accuracy : 0.7206          
+                                          
+       'Positive' Class : Yes             
+                                          
+RandonForest AUC: 0.781148 
+
+-----------------Tuned Random Forest Model--------------
+
+Tuned Random Forest Model:
+
+Call:
+ randomForest(formula = AcceptedAny ~ ., data = train_balanced,      ) 
+               Type of random forest: classification
+                     Number of trees: 500
+No. of variables tried at each split: 4
+
+        OOB estimate of  error rate: 25.45%
+Confusion matrix:
+     No Yes class.error
+No  572 208   0.2666667
+Yes 191 597   0.2423858
+
+Confusion Matrix - Tuned Random Forest:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction  No Yes
+       No  415  46
+       Yes 114  97
+                                          
+               Accuracy : 0.7619          
+                 95% CI : (0.7278, 0.7936)
+    No Information Rate : 0.7872          
+    P-Value [Acc > NIR] : 0.949           
+                                          
+                  Kappa : 0.3944          
+                                          
+ Mcnemar's Test P-Value : 0.0000001178    
+                                          
+            Sensitivity : 0.6783          
+            Specificity : 0.7845          
+         Pos Pred Value : 0.4597          
+         Neg Pred Value : 0.9002          
+             Prevalence : 0.2128          
+         Detection Rate : 0.1443          
+   Detection Prevalence : 0.3140          
+      Balanced Accuracy : 0.7314          
+                                          
+       'Positive' Class : Yes             
+                                          
+Tuned RF AUC: 0.777506
