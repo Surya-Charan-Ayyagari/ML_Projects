@@ -1,7 +1,4 @@
-#========================================================
-# 1. INSTALL & LOAD REQUIRED PACKAGES (AI Assisted)
-#========================================================
-
+#============ INSTALL & LOAD REQUIRED PACKAGES=======
 required_packages <- c(
   "lubridate",
   "dplyr",
@@ -9,13 +6,26 @@ required_packages <- c(
   "arules",
   "caret",
   "rpart",
+  "rattle",
+  "cluster",
+  "forecast",
   "fastDummies",
   "cluster",
+  "factoextra",
   "corrplot",
   "scales",
   "ROCR",
   "ROSE",
-  "randomForest"
+  "randomForest",
+  "pROC",
+  "rpart.plot",
+  "missRanger",
+  "mice",
+  "VIM",
+  "GGally",
+  "car",
+  "C50",
+  "tidyr"
 )
 
 # Install missing packages only
@@ -30,14 +40,20 @@ lapply(required_packages, library, character.only = TRUE)
 
 
 # Avoid scientific notation in printed output
-options(scipen = 999) #AI Assisted
+options(scipen = 999)
 
 # Save current plotting settings
-old_par <- par(no.readonly = TRUE) #AI Assisted
+old_par <- par(no.readonly = TRUE) 
 
-#---------------------------
-# 2. Load the dataset
-#---------------------------
+set.seed(2026)
+
+#============ CONSUMER BEHAVIOR ANALYSIS=========
+
+cat("\n============ CONSUMER BEHAVIOR ANALYSIS=========\n")
+
+
+##--------- Load the dataset-----------
+
 cat("------------ DATA LOADING ------------\n")
 
 cons_data <- read.csv("./Consumer_Data.csv")
@@ -46,9 +62,8 @@ cat("Dataset loaded successfully.\n")
 cat("Number of rows   :", nrow(cons_data), "\n")
 cat("Number of columns:", ncol(cons_data), "\n\n")
 
-#---------------------------
-# 3. Initial data quality check
-#---------------------------
+##--------- Initial data quality check--------
+
 cat("------------ INITIAL DATA QUALITY CHECK ------------\n")
 
 cat("Preview of first 6 rows:\n")
@@ -78,9 +93,8 @@ if (length(unique(cons_data$ID)) == nrow(cons_data)) {
   cat("Warning: Duplicate customer IDs may exist.\n\n")
 }
 
-#-----------------------------
-# 4. Create Variables for EDA
-#-----------------------------
+##--------- Create Variables for EDA----------
+
 
 cons_data$TotalSpend <- cons_data$MntWines + cons_data$MntFruits +
   cons_data$MntMeatProducts + cons_data$MntFishProducts +
@@ -109,9 +123,8 @@ cons_data$AgeBins <- cut(
   breaks = c(0, 18, 25, 30, 40, 50, 60, 70, 90, Inf)
 )
 
-#---------------------------
-# 5. Exploratory analysis
-#---------------------------
+##--------- Exploratory analysis -------------
+
 cat("------------ EXPLORATORY DATA ANALYSIS ------------\n")
 
 cat("Total spending across product categories:\n")
@@ -263,9 +276,8 @@ campaign_response_summary <- cons_data %>%
   )
 print(campaign_response_summary)
 
-#---------------------------
-# 7. Data visualization
-#---------------------------
+##--------- Data visualization ------------
+
 cat("\n------------ VISUAL INSPECTION OF NUMERIC VARIABLES ------------\n")
 
 num_var <- c("Income", "Kidhome", "Teenhome", "Recency", "MntWines", "MntFruits",
@@ -294,9 +306,8 @@ for (x in num_var) {
 par(mfrow = c(1, 1))
 par(old_par)
 
-#---------------------------
-# 8. Correlation analysis
-#---------------------------
+##--------- Correlation analysis ---------------
+
 cat("\n------------ CORRELATION ANALYSIS ------------\n")
 
 cor_data <- cons_data[, -c(1, 2, 3, 4, 8, 27, 28, 30:36)]
@@ -307,9 +318,8 @@ print(cor_mat)
 
 corrplot::corrplot.mixed(cor_mat)
 
-#---------------------------
-# 9. Missing value analysis
-#---------------------------
+##--------- Missing value analysis ---------------
+
 cat("\n------------ MISSING VALUE ANALYSIS ------------\n")
 
 inc_na <- cons_data[is.na(cons_data$Income), ]
@@ -318,9 +328,8 @@ cat("Number of missing Income values:", nrow(inc_na), "\n")
 cat("Summary of records with missing Income:\n")
 print(summary(inc_na))
 
-#---------------------------
-# 10. Train-test split
-#---------------------------
+##--------- Train-test split --------------
+
 
 
 cat("\n------------ TRAIN-TEST SPLIT ------------\n")
@@ -350,9 +359,8 @@ print(prop.table(table(test_data$AcceptedAny)))
 cat("\nTraining data summary:\n")
 print(summary(train_data))
 
-#---------------------------
-# 11. Income imputation
-#---------------------------
+##--------- Income imputation----------
+
 
 cat("\n------------ INCOME IMPUTATION ------------\n")
 
@@ -375,9 +383,8 @@ cat("\nMissing Income values after imputation:\n")
 cat("Training data:", sum(is.na(train_data$IncomeImp)), "\n")
 cat("Testing data :", sum(is.na(test_data$IncomeImp)), "\n")
 
-#---------------------------
-# 12. PCA on spending variables
-#---------------------------
+##--------- PCA on spending variables -------------
+
 
 
 cat("\n------------ PCA FOR SPENDING VARIABLES ------------\n")
@@ -415,17 +422,15 @@ colnames(test_pca_3) <- c("PC1", "PC2", "PC3")
 
 cat("\nFirst 3 principal components extracted for clustering.\n")
 
-#--------------------------------------
-# 13. Standardization of numeric variables
-#---------------------------------------
+##--------- Standardization of numeric variables ----------
+
 
 std_model <- preProcess(train_data, method = "range")
 train_data_std <- predict(std_model, train_data)
 test_data_std <- predict(std_model, test_data)
 
-#---------------------------
-# 14. Clustering analysis
-#---------------------------
+##--------- Clustering analysis --------------
+
 
 
 cat("\n------------ CLUSTERING ANALYSIS ------------\n")
@@ -476,14 +481,14 @@ cat("Within-cluster sum of squares for k = 2 to 10:\n")
 print(elbow_df)
 
 print(ggplot(elbow_df, aes(x = k, y = WSS)) +
-  geom_line() +
-  geom_point() +
-  labs(
-    title = "Elbow Method for Optimal Number of Clusters",
-    x = "Number of Clusters (k)",
-    y = "Total Within-Cluster Sum of Squares"
-  ) +
-  theme_minimal())
+        geom_line() +
+        geom_point() +
+        labs(
+          title = "Elbow Method for Optimal Number of Clusters",
+          x = "Number of Clusters (k)",
+          y = "Total Within-Cluster Sum of Squares"
+        ) +
+        theme_minimal())
 
 
 set.seed(2026)
@@ -592,9 +597,8 @@ ggplot(centers_long, aes(x = variable, y = value, fill = cluster)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-#--------------------------------------------------
-# 15. TESTING WHETHER CLUSTERS ARE MEANINGFULLY DIFFERENT (AI ASSISTED)
-#--------------------------------------------------
+##--------- TESTING WHETHER CLUSTERS ARE MEANINGFULLY DIFFERENT --------------
+
 
 
 cat("\n-------ANOVA: Income vs Cluster -------\n")
@@ -637,9 +641,8 @@ model <- glm(AcceptedAny ~ as.factor(cluster),
 
 print(summary(model))
 
-#-------------------------
-# 16. Association Analysis
-#-------------------------
+##----------- Association Analysis-----------
+
 cat("\n------------ASSOCIATION ANALYSIS-----------------")
 arule_data <- train_data[,c("AcceptedCmp1", "AcceptedCmp2", "AcceptedCmp3",
                             "AcceptedCmp4", "AcceptedCmp5", "AcceptedAny")]
@@ -676,7 +679,7 @@ rules_campaign <- apriori(
             "AcceptedCmp1=Yes", "AcceptedCmp2=Yes",
             "AcceptedCmp3=Yes", "AcceptedCmp4=Yes",
             "AcceptedCmp5=Yes"
-            ),
+    ),
     default = "lhs"
   )
 )
@@ -726,9 +729,8 @@ cat("\nTop rules:\n")
 
 inspect(sort(rules_campaign_yeslhs, by = "lift"))
 
-#---------------------------
-# 17. Regression Analysis
-#---------------------------
+##--------- Regression Analysis -------------
+
 cat("\n------------REGRESSION ANALYSIS-----------------")
 reg_vars <- c("Age", "Education", "Marital_Status", "IncomeImp",
               "Kidhome", "Teenhome", "Recency",
@@ -760,7 +762,7 @@ plot(reg_model_step, ask = FALSE)
 reg_pred <- predict(reg_model_step, newdata = reg_test)
 
 # Evaluate regression performance
-rmse_val <- sqrt(mean((reg_test$TotalPurchases - reg_qpred)^2))
+rmse_val <- sqrt(mean((reg_test$TotalPurchases - reg_pred)^2))
 mae_val <- mean(abs(reg_test$TotalPurchases - reg_pred))
 cor(reg_test$TotalPurchases,reg_pred)
 
@@ -796,14 +798,13 @@ cat("MAE :", mae_clean, "\n")
 cat("Correlation:", cor_clean, "\n")
 cat("R-squared:", r2_clean, "\n")
 
-#-----------------------------
-# 18. Classification Model
-#-----------------------------
+##--------- Classification Model -------------
+
 cat("\n------------CLASSIFICATION MODEL-----------------")
 class_train <- cbind(train_data[, c("Age", "Education", "Marital_Status", "IncomeImp",
-                              "Kidhome", "Teenhome", "Recency", "NumDealsPurchases",
-                              "NumWebPurchases", "NumCatalogPurchases", "NumStorePurchases",
-                              "NumWebVisitsMonth", "Complain", "AcceptedAny")], pca_3)
+                                    "Kidhome", "Teenhome", "Recency", "NumDealsPurchases",
+                                    "NumWebPurchases", "NumCatalogPurchases", "NumStorePurchases",
+                                    "NumWebVisitsMonth", "Complain", "AcceptedAny")], pca_3)
 class_test <- cbind(test_data[, c("Age", "Education", "Marital_Status", "IncomeImp",
                                   "Kidhome", "Teenhome", "Recency", "NumDealsPurchases",
                                   "NumWebPurchases", "NumCatalogPurchases", "NumStorePurchases",
@@ -821,7 +822,7 @@ class_test$Marital_Status[class_test$Marital_Status %in% rare_marital] <- "Other
 # Convert back to factor
 class_train$Marital_Status <- factor(class_train$Marital_Status)
 class_test$Marital_Status  <- factor(class_test$Marital_Status,
-                                    levels = levels(class_train$Marital_Status))
+                                     levels = levels(class_train$Marital_Status))
 table(class_train$AcceptedAny)
 prop.table(table(class_train$AcceptedAny))
 class_train$AcceptedAny <- factor(
@@ -850,7 +851,7 @@ print(prop.table(table(train_balanced$AcceptedAny)))
 
 
 
-#-----------------Logistic Regression--------------
+###-------- Logistic Regression------------
 cat("\n-----------------Logistic Regression--------------\n")
 model_glm <- glm(
   AcceptedAny~ .,
@@ -887,7 +888,7 @@ plot(
 abline(a = 0, b = 1, lty = 2)
 
 
-#----------Decision Tree Model -----------------
+###-------- Decision Tree Model -----------------
 cat("\n-----------------Decision Tree Model--------------\n")
 
 set.seed(2026)
@@ -930,7 +931,7 @@ plot(
 )
 abline(a = 0, b = 1, lty = 2)
 
-#---------Random Forest Model-------------
+###-------- Random Forest Model-------------
 cat("\n-----------------Random Forest Model--------------\n")
 
 set.seed(2026)
@@ -1016,9 +1017,3 @@ cat("Tuned RF AUC:", auc_rft, "\n")
 perf_roc_rft <- performance(pred_obj_rft, "tpr", "fpr")
 plot(perf_roc_rft,  main = "Tuned Random Forest ROC Curve", lwd = 2)
 abline(a = 0, b = 1, lty = 2)
-
-"Notes on AI Assistance:
-  Commented the parts where AI assisted for this project. AI was succesful in most cases but 
-  I had to correct and debug some code in EDA summaries and in K-means elbow method. Other than
-  these coding assistance, I have used AI assistance for commenting and writing Print statments
-  in code."
