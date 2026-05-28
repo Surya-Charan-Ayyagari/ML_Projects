@@ -1,0 +1,1504 @@
+===========HOME EQUITY LOAN ANALYSIS============
+------------ DATA LOADING AND INITIAL REVIEW ------------
+Dimensions of dataset: 5960 rows and 13 columns
+
+  BAD LOAN MORTDUE  VALUE  REASON    JOB  YOJ DEROG DELINQ     CLAGE NINQ CLNO  DEBTINC
+1   1 1100   25860  39025 HomeImp  Other 10.5     0      0  94.36667    1    9       NA
+2   1 1300   70053  68400 HomeImp  Other  7.0     0      2 121.83333    0   14       NA
+3   1 1500   13500  16700 HomeImp  Other  4.0     0      0 149.46667    1   10       NA
+4   1 1500      NA     NA                  NA    NA     NA        NA   NA   NA       NA
+5   0 1700   97800 112000 HomeImp Office  3.0     0      0  93.33333    0   14       NA
+6   1 1700   30548  40320 HomeImp  Other  9.0     0      0 101.46600    1    8 37.11361
+
+Structure of dataset:
+'data.frame':	5960 obs. of  13 variables:
+ $ BAD    : int  1 1 1 1 0 1 1 1 1 1 ...
+ $ LOAN   : int  1100 1300 1500 1500 1700 1700 1800 1800 2000 2000 ...
+ $ MORTDUE: num  25860 70053 13500 NA 97800 ...
+ $ VALUE  : num  39025 68400 16700 NA 112000 ...
+ $ REASON : chr  "HomeImp" "HomeImp" "HomeImp" "" ...
+ $ JOB    : chr  "Other" "Other" "Other" "" ...
+ $ YOJ    : num  10.5 7 4 NA 3 9 5 11 3 16 ...
+ $ DEROG  : int  0 0 0 NA 0 0 3 0 0 0 ...
+ $ DELINQ : int  0 2 0 NA 0 0 2 0 2 0 ...
+ $ CLAGE  : num  94.4 121.8 149.5 NA 93.3 ...
+ $ NINQ   : int  1 0 1 NA 0 1 1 0 1 0 ...
+ $ CLNO   : int  9 14 10 NA 14 8 17 8 12 13 ...
+ $ DEBTINC: num  NA NA NA NA NA ...
+
+Missing values by variable:
+    BAD    LOAN MORTDUE   VALUE  REASON     JOB     YOJ   DEROG  DELINQ   CLAGE    NINQ    CLNO DEBTINC 
+      0       0     518     112     252     279     515     708     580     308     510     222    1267 
+
+Percentage of missing values by variable:
+    BAD    LOAN MORTDUE   VALUE  REASON     JOB     YOJ   DEROG  DELINQ   CLAGE    NINQ    CLNO DEBTINC 
+   0.00    0.00    8.69    1.88    4.23    4.68    8.64   11.88    9.73    5.17    8.56    3.72   21.26 
+
+Number of unique rows: 5960 
+Number of duplicate rows: 0 
+
+------------ EXPLORATORY DATA ANALYSIS ------------
+Summary statistics:
+      BAD              LOAN          MORTDUE           VALUE           REASON              JOB           
+ Min.   :0.0000   Min.   : 1100   Min.   :  2063   Min.   :  8000   Length:5960        Length:5960       
+ 1st Qu.:0.0000   1st Qu.:11100   1st Qu.: 46276   1st Qu.: 66076   Class :character   Class :character  
+ Median :0.0000   Median :16300   Median : 65019   Median : 89236   Mode  :character   Mode  :character  
+ Mean   :0.1995   Mean   :18608   Mean   : 73761   Mean   :101776                                        
+ 3rd Qu.:0.0000   3rd Qu.:23300   3rd Qu.: 91488   3rd Qu.:119824                                        
+ Max.   :1.0000   Max.   :89900   Max.   :399550   Max.   :855909                                        
+                                  NA's   :518      NA's   :112                                           
+      YOJ             DEROG             DELINQ            CLAGE             NINQ             CLNO     
+ Min.   : 0.000   Min.   : 0.0000   Min.   : 0.0000   Min.   :   0.0   Min.   : 0.000   Min.   : 0.0  
+ 1st Qu.: 3.000   1st Qu.: 0.0000   1st Qu.: 0.0000   1st Qu.: 115.1   1st Qu.: 0.000   1st Qu.:15.0  
+ Median : 7.000   Median : 0.0000   Median : 0.0000   Median : 173.5   Median : 1.000   Median :20.0  
+ Mean   : 8.922   Mean   : 0.2546   Mean   : 0.4494   Mean   : 179.8   Mean   : 1.186   Mean   :21.3  
+ 3rd Qu.:13.000   3rd Qu.: 0.0000   3rd Qu.: 0.0000   3rd Qu.: 231.6   3rd Qu.: 2.000   3rd Qu.:26.0  
+ Max.   :41.000   Max.   :10.0000   Max.   :15.0000   Max.   :1168.2   Max.   :17.000   Max.   :71.0  
+ NA's   :515      NA's   :708       NA's   :580       NA's   :308      NA's   :510      NA's   :222   
+    DEBTINC        
+ Min.   :  0.5245  
+ 1st Qu.: 29.1400  
+ Median : 34.8183  
+ Mean   : 33.7799  
+ 3rd Qu.: 39.0031  
+ Max.   :203.3121  
+ NA's   :1267      
+
+Class distribution of BAD:
+
+   0    1 
+4771 1189 
+
+Class percentage distribution of BAD:
+
+    0     1 
+80.05 19.95 
+
+Continuous variables selected for visual inspection:
+[1] "LOAN"    "MORTDUE" "VALUE"   "YOJ"     "CLAGE"   "DEBTINC"
+
+Discrete numeric variables selected for review:
+[1] "DELINQ" "DEROG"  "NINQ"   "CLNO"  
+
+Default behavior across DELINQ:
+# A tibble: 15 × 4
+   DELINQ count bad_borrowers bad_borrower_pct
+    <int> <int>         <int>            <dbl>
+ 1      0  4179           583             14.0
+ 2      1   654           222             33.9
+ 3      2   250           112             44.8
+ 4      3   129            71             55.0
+ 5      4    78            46             59.0
+ 6      5    38            31             81.6
+ 7      6    27            27            100  
+ 8      7    13            13            100  
+ 9      8     5             5            100  
+10     10     2             2            100  
+11     11     2             2            100  
+12     12     1             1            100  
+13     13     1             1            100  
+14     15     1             1            100  
+15     NA   580            72             12.4
+
+Default behavior across DEROG:
+# A tibble: 12 × 4
+   DEROG count bad_borrowers bad_borrower_pct
+   <int> <int>         <int>            <dbl>
+ 1     0  4527           754             16.7
+ 2     1   435           169             38.9
+ 3     2   160            82             51.2
+ 4     3    58            43             74.1
+ 5     4    23            18             78.3
+ 6     5    15             7             46.7
+ 7     6    15            10             66.7
+ 8     7     8             8            100  
+ 9     8     6             6            100  
+10     9     3             3            100  
+11    10     2             2            100  
+12    NA   708            87             12.3
+
+Default behavior across NINQ:
+# A tibble: 17 × 4
+    NINQ count bad_borrowers bad_borrower_pct
+   <int> <int>         <int>            <dbl>
+ 1     0  2531           396             15.6
+ 2     1  1339           254             19.0
+ 3     2   780           181             23.2
+ 4     3   392           107             27.3
+ 5     4   156            61             39.1
+ 6     5    75            36             48  
+ 7     6    56            29             51.8
+ 8     7    44            15             34.1
+ 9     8    22            11             50  
+10     9    11             6             54.5
+11    10    28             9             32.1
+12    11    10             3             30  
+13    12     2             2            100  
+14    13     2             2            100  
+15    14     1             1            100  
+16    17     1             1            100  
+17    NA   510            75             14.7
+
+Borrower characteristics by BAD status:
+# A tibble: 2 × 7
+  `factor(BAD)` count med_loan delinq derog credit_inq  clno
+  <fct>         <int>    <int>  <int> <int>      <int> <dbl>
+1 0              4771    16900   1045   557       4478  21.3
+2 1              1189    14900   1373   780       1986  21.2
+
+Loan and delinquency patterns by REASON:
+# A tibble: 3 × 5
+  REASON  count bad_borrowers med_loan delinq
+  <chr>   <int>         <int>    <dbl>  <int>
+1 DebtCon  3928           745    18000   1565
+2 HomeImp  1780           396    12600    734
+3 NA        252            48    15300    119
+
+Loan and delinquency patterns by JOB:
+# A tibble: 7 × 5
+  JOB     count bad_borrowers med_loan delinq
+  <chr>   <int>         <int>    <dbl>  <int>
+1 Mgr       767           179    18100    439
+2 Office    948           125    16200    397
+3 Other    2388           554    15650    906
+4 ProfExe  1276           212    17300    510
+5 Sales     109            38    14300     30
+6 Self      193            58    24000    103
+7 NA        279            23    13400     33
+
+Displaying pairwise plot for selected numeric variables...
+------------ CORRELATION ANALYSIS ------------                                                                   
+
+Correlation matrix:
+          BAD  LOAN MORTDUE VALUE   YOJ DEROG DELINQ CLAGE  NINQ  CLNO DEBTINC
+BAD      1.00 -0.03   -0.01 -0.02 -0.06  0.26   0.28 -0.12  0.13  0.01    0.23
+LOAN    -0.03  1.00    0.23  0.36  0.11 -0.03  -0.05  0.05  0.04  0.05    0.15
+MORTDUE -0.01  0.23    1.00  0.86 -0.11 -0.03  -0.03  0.13  0.04  0.33    0.18
+VALUE   -0.02  0.36    0.86  1.00 -0.02 -0.04  -0.06  0.20  0.00  0.22    0.13
+YOJ     -0.06  0.11   -0.11 -0.02  1.00 -0.06   0.02  0.23 -0.06 -0.01   -0.06
+DEROG    0.26 -0.03   -0.03 -0.04 -0.06  1.00   0.15 -0.06  0.18  0.07    0.04
+DELINQ   0.28 -0.05   -0.03 -0.06  0.02  0.15   1.00  0.01  0.01  0.13    0.05
+CLAGE   -0.12  0.05    0.13  0.20  0.23 -0.06   0.01  1.00 -0.09  0.20   -0.06
+NINQ     0.13  0.04    0.04  0.00 -0.06  0.18   0.01 -0.09  1.00  0.09    0.15
+CLNO     0.01  0.05    0.33  0.22 -0.01  0.07   0.13  0.20  0.09  1.00    0.14
+DEBTINC  0.23  0.15    0.18  0.13 -0.06  0.04   0.05 -0.06  0.15  0.14    1.00
+
+------------ DATA PREPROCESSING AND OUTLIER REVIEW ------------
+Potential extreme outliers using mean + 3*SD rule:
+Variable: LOAN | Threshold: 52230.41 | Max: 89900 | Outliers: 95 
+Variable: MORTDUE | Threshold: 207133.6 | Max: 399550 | Outliers: 88 
+Variable: VALUE | Threshold: 273933.4 | Max: 855909 | Outliers: 89 
+Variable: YOJ | Threshold: 31.64 | Max: 41 | Outliers: 18 
+Variable: CLAGE | Threshold: 437.2 | Max: 1168.23 | Outliers: 30 
+Variable: DEBTINC | Threshold: 59.59 | Max: 203.31 | Outliers: 27 
+
+Top records with largest CLAGE values:
+     BAD  LOAN MORTDUE  VALUE  REASON     JOB YOJ DEROG DELINQ     CLAGE NINQ CLNO  DEBTINC
+3680   1 19300   96454 157809 DebtCon   Other   3     0      0 1168.2336    0    0 40.20614
+3098   1 16800   87300 155500 DebtCon   Other   3     0      0 1154.6333    0    0       NA
+4471   0 23300   61496 102823 HomeImp ProfExe  18     0      0  649.7471    1   24 20.87256
+4537   0 23700   57553 101656 HomeImp ProfExe  19     0      0  648.3285    0   23 22.84648
+4265   0 22200   64809  96831 HomeImp ProfExe  17     0      0  639.0582    0   24 22.61418
+4239   0 22000   61042  96622 HomeImp ProfExe  17     0      0  638.2754    1   23 21.45735
+
+Cases where CLNO = 0:
+        CLAGE CLNO
+22         NA    0
+93         NA    0
+119        NA    0
+221        NA    0
+299        NA    0
+330        NA    0
+342        NA    0
+419        NA    0
+423        NA    0
+553        NA    0
+579        NA    0
+660        NA    0
+724        NA    0
+1494       NA    0
+1725       NA    0
+1781       NA    0
+1856       NA    0
+1857       NA    0
+2079       NA    0
+2114       NA    0
+2193       NA    0
+2204       NA    0
+2290       NA    0
+2366       NA    0
+2388       NA    0
+2618       NA    0
+2634       NA    0
+2636       NA    0
+2660       NA    0
+2802       NA    0
+2829       NA    0
+3098 1154.633    0
+3212       NA    0
+3680 1168.234    0
+3691       NA    0
+3942       NA    0
+4248       NA    0
+4493       NA    0
+4782       NA    0
+4855       NA    0
+4884       NA    0
+5125       NA    0
+5376       NA    0
+5544       NA    0
+5547       NA    0
+5557       NA    0
+5567       NA    0
+5569       NA    0
+5570       NA    0
+5571       NA    0
+5572       NA    0
+5579       NA    0
+5588       NA    0
+5589       NA    0
+5591       NA    0
+5596       NA    0
+5608       NA    0
+5609       NA    0
+5636       NA    0
+5638       NA    0
+5785       NA    0
+5805       NA    0
+
+Replaced CLAGE values > 1150 with 0.
+
+Cases with CLNO = 0 after anomaly review:
+     CLAGE CLNO DEROG DELINQ NINQ
+22      NA    0     1      0    1
+93      NA    0     0      0    0
+119     NA    0     0      0    0
+221     NA    0     0      0    0
+299     NA    0     0      0    0
+330     NA    0     0      0    0
+342     NA    0     0      1    0
+419     NA    0     0      0    0
+423     NA    0     0      0    0
+553     NA    0     0      0    0
+579     NA    0     0      0    1
+660     NA    0     0      0    0
+724     NA    0     0      0    0
+1494    NA    0     0      0    2
+1725    NA    0     0      0    0
+1781    NA    0     0      0    0
+1856    NA    0     0      0    0
+1857    NA    0     0      0    0
+2079    NA    0     0      0    0
+2114    NA    0     0      0    0
+2193    NA    0     0      0    0
+2204    NA    0     0      0    0
+2290    NA    0     0      0    0
+2366    NA    0     0      0    0
+2388    NA    0     0      0    0
+2618    NA    0     0      0    0
+2634    NA    0     0      0    0
+2636    NA    0     0      0    0
+2660    NA    0     0      0    0
+2802    NA    0     0      0    0
+2829    NA    0     0      0    0
+3098     0    0     0      0    0
+3212    NA    0     0      0    0
+3680     0    0     0      0    0
+3691    NA    0     0      0    0
+3942    NA    0     0      0    0
+4248    NA    0     0      0    0
+4493    NA    0     0      0    0
+4782    NA    0     0      0    0
+4855    NA    0     0      0    0
+4884    NA    0     0      0    0
+5125    NA    0     0      0    0
+5376    NA    0     0      0    0
+5544    NA    0     0      0    7
+5547    NA    0     0      0    6
+5557    NA    0     0      0    7
+5567    NA    0     0      0    7
+5569    NA    0     0      0    6
+5570    NA    0     0      0    7
+5571    NA    0     0      0    6
+5572    NA    0     0      0    7
+5579    NA    0     0      0    7
+5588    NA    0     0      0    6
+5589    NA    0     0      0    7
+5591    NA    0     0      0    6
+5596    NA    0     0      0    7
+5608    NA    0     0      0    6
+5609    NA    0     0      0    7
+5636    NA    0     0      0    6
+5638    NA    0     0      0    7
+5785    NA    0     0      0    0
+5805    NA    0     0      0    0
+
+------------ MISSING VALUE ANALYSIS ------------
+Overall missing data pattern:
+     BAD LOAN VALUE CLNO REASON JOB CLAGE NINQ YOJ MORTDUE DELINQ DEROG DEBTINC     
+3364   1    1     1    1      1   1     1    1   1       1      1     1       1    0
+883    1    1     1    1      1   1     1    1   1       1      1     1       0    1
+125    1    1     1    1      1   1     1    1   1       1      1     0       1    1
+27     1    1     1    1      1   1     1    1   1       1      1     0       0    2
+12     1    1     1    1      1   1     1    1   1       1      0     1       1    1
+6      1    1     1    1      1   1     1    1   1       1      0     1       0    2
+91     1    1     1    1      1   1     1    1   1       1      0     0       1    2
+14     1    1     1    1      1   1     1    1   1       1      0     0       0    3
+166    1    1     1    1      1   1     1    1   1       0      1     1       1    1
+52     1    1     1    1      1   1     1    1   1       0      1     1       0    2
+14     1    1     1    1      1   1     1    1   1       0      0     0       1    3
+1      1    1     1    1      1   1     1    1   1       0      0     0       0    4
+184    1    1     1    1      1   1     1    1   0       1      1     1       1    1
+36     1    1     1    1      1   1     1    1   0       1      1     1       0    2
+1      1    1     1    1      1   1     1    1   0       1      1     0       0    3
+1      1    1     1    1      1   1     1    1   0       1      0     1       0    3
+7      1    1     1    1      1   1     1    1   0       1      0     0       1    3
+1      1    1     1    1      1   1     1    1   0       1      0     0       0    4
+45     1    1     1    1      1   1     1    1   0       0      1     1       1    2
+12     1    1     1    1      1   1     1    1   0       0      1     1       0    3
+6      1    1     1    1      1   1     1    1   0       0      1     0       1    3
+1      1    1     1    1      1   1     1    1   0       0      1     0       0    4
+35     1    1     1    1      1   1     1    0   1       1      1     1       1    1
+8      1    1     1    1      1   1     1    0   1       1      1     1       0    2
+14     1    1     1    1      1   1     1    0   1       1      1     0       1    2
+4      1    1     1    1      1   1     1    0   1       1      1     0       0    3
+17     1    1     1    1      1   1     1    0   1       1      0     1       1    2
+2      1    1     1    1      1   1     1    0   1       1      0     1       0    3
+87     1    1     1    1      1   1     1    0   1       1      0     0       1    3
+8      1    1     1    1      1   1     1    0   1       1      0     0       0    4
+12     1    1     1    1      1   1     1    0   1       0      0     1       1    3
+1      1    1     1    1      1   1     1    0   1       0      0     1       0    4
+9      1    1     1    1      1   1     1    0   1       0      0     0       1    4
+1      1    1     1    1      1   1     1    0   1       0      0     0       0    5
+4      1    1     1    1      1   1     1    0   0       1      1     1       1    2
+3      1    1     1    1      1   1     1    0   0       1      1     1       0    3
+12     1    1     1    1      1   1     1    0   0       0      0     1       1    4
+1      1    1     1    1      1   1     1    0   0       0      0     1       0    5
+40     1    1     1    1      1   1     1    0   0       0      0     0       1    5
+4      1    1     1    1      1   1     1    0   0       0      0     0       0    6
+21     1    1     1    1      1   1     0    1   1       1      1     1       1    1
+16     1    1     1    1      1   1     0    1   1       1      1     1       0    2
+2      1    1     1    1      1   1     0    1   1       0      1     1       0    3
+16     1    1     1    1      1   1     0    1   0       1      1     1       1    2
+1      1    1     1    1      1   1     0    1   0       1      1     1       0    3
+81     1    1     1    1      1   0     1    1   1       1      1     1       1    1
+13     1    1     1    1      1   0     1    1   1       1      1     1       0    2
+4      1    1     1    1      1   0     1    1   1       0      1     1       1    2
+1      1    1     1    1      1   0     1    1   1       0      1     1       0    3
+11     1    1     1    1      1   0     1    0   1       1      1     0       1    3
+1      1    1     1    1      1   0     1    0   1       1      1     0       0    4
+8      1    1     1    1      1   0     0    1   1       0      1     1       1    3
+1      1    1     1    1      1   0     0    1   1       0      1     1       0    4
+70     1    1     1    1      0   1     1    1   1       1      1     1       1    1
+27     1    1     1    1      0   1     1    1   1       1      1     1       0    2
+8      1    1     1    1      0   1     1    1   1       1      1     0       1    2
+1      1    1     1    1      0   1     1    1   1       1      1     0       0    3
+1      1    1     1    1      0   1     1    1   0       1      1     1       0    3
+8      1    1     1    1      0   1     1    1   0       0      1     1       1    3
+1      1    1     1    1      0   1     1    1   0       0      1     1       0    4
+1      1    1     1    1      0   1     1    0   1       1      1     1       1    2
+1      1    1     1    1      0   1     1    0   1       1      1     1       0    3
+10     1    1     1    1      0   1     1    0   0       1      0     1       1    4
+1      1    1     1    1      0   1     1    0   0       1      0     1       0    5
+7      1    1     1    1      0   1     0    1   1       1      1     1       1    2
+1      1    1     1    1      0   1     0    1   1       1      1     1       0    3
+6      1    1     1    1      0   0     1    1   1       0      1     1       1    3
+2      1    1     1    1      0   0     1    1   1       0      1     1       0    4
+11     1    1     1    1      0   0     0    1   1       0      1     1       1    4
+1      1    1     1    1      0   0     0    1   1       0      1     1       0    5
+35     1    1     1    0      1   1     0    0   1       1      0     0       1    5
+ [ reached getOption("max.print") -- omitted 47 rows ]
+
+Displaying missing-value aggregation plot...
+Correlation among missingness indicators:
+        MORTDUE VALUE REASON   JOB   YOJ DEROG DELINQ CLAGE  NINQ CLNO DEBTINC
+MORTDUE    1.00  0.08   0.18  0.21  0.32  0.18   0.26  0.21  0.25 0.19    0.01
+VALUE      0.08  1.00   0.09  0.07  0.01  0.06   0.05  0.07  0.04 0.09    0.17
+REASON     0.18  0.09   1.00  0.38  0.24  0.17   0.20  0.35  0.23 0.33    0.00
+JOB        0.21  0.07   0.38  1.00  0.21  0.27   0.28  0.50  0.34 0.51   -0.03
+YOJ        0.32  0.01   0.24  0.21  1.00  0.21   0.29  0.29  0.32 0.31   -0.03
+DEROG      0.18  0.06   0.17  0.27  0.21  1.00   0.76  0.43  0.63 0.54   -0.03
+DELINQ     0.26  0.05   0.20  0.28  0.29  0.76   1.00  0.49  0.76 0.60   -0.03
+CLAGE      0.21  0.07   0.35  0.50  0.29  0.43   0.49  1.00  0.53 0.84    0.03
+NINQ       0.25  0.04   0.23  0.34  0.32  0.63   0.76  0.53  1.00 0.64   -0.02
+CLNO       0.19  0.09   0.33  0.51  0.31  0.54   0.60  0.84  0.64 1.00    0.02
+DEBTINC    0.01  0.17   0.00 -0.03 -0.03 -0.03  -0.03  0.03 -0.02 0.02    1.00
+
+Correlation between numeric values and missingness indicators:
+        MORTDUE VALUE   YOJ DEROG DELINQ CLAGE  NINQ  CLNO DEBTINC
+MORTDUE      NA  0.00 -0.07  0.03  -0.01 -0.03 -0.02 -0.03   -0.06
+VALUE     -0.19    NA -0.09 -0.04  -0.08 -0.06 -0.06 -0.05   -0.05
+YOJ       -0.01  0.01    NA -0.03  -0.09 -0.07 -0.07 -0.04   -0.02
+DEROG      0.04  0.13  0.05    NA   0.17  0.01  0.14    NA    0.19
+DELINQ    -0.03  0.18 -0.04  0.23     NA -0.05  0.07    NA    0.24
+CLAGE      0.03 -0.03  0.09  0.04  -0.03    NA -0.01    NA   -0.10
+NINQ      -0.04  0.01 -0.04  0.11   0.10  0.03    NA    NA    0.15
+CLNO      -0.24  0.00 -0.11  0.08  -0.02 -0.22 -0.01    NA    0.01
+DEBTINC   -0.20 -0.04 -0.02  0.00  -0.05 -0.15 -0.11 -0.09      NA
+
+Missing pattern for selected credit-history variables:
+     CLNO CLAGE NINQ DELINQ DEROG     
+5037    1     1    1      1     1    0
+174     1     1    1      1     0    1
+21      1     1    1      0     1    1
+132     1     1    1      0     0    2
+52      1     1    0      1     1    1
+31      1     1    0      1     0    2
+56      1     1    0      0     1    2
+149     1     1    0      0     0    3
+86      1     0    1      1     1    1
+222     0     0    0      0     0    5
+      222   308  510    580   708 2328
+
+Distribution of MISS_CRED_INFO:
+
+   0    1 
+5738  222 
+
+------------ TRAIN-TEST SPLIT ------------
+Training set dimensions: 4172 rows and 14 columns
+Testing set dimensions : 1788 rows and 14 columns
+
+Train data class proportions (%):
+
+    0     1 
+80.23 19.77 
+
+Training data summary:
+      BAD              LOAN          MORTDUE           VALUE            REASON          JOB            YOJ        
+ Min.   :0.0000   Min.   : 1300   Min.   :  2063   Min.   :  8800   DebtCon:2741   Mgr    : 534   Min.   : 0.000  
+ 1st Qu.:0.0000   1st Qu.:11100   1st Qu.: 46120   1st Qu.: 66467   HomeImp:1249   Office : 658   1st Qu.: 3.000  
+ Median :0.0000   Median :16300   Median : 64917   Median : 89250   NA's   : 182   Other  :1666   Median : 7.000  
+ Mean   :0.1977   Mean   :18622   Mean   : 73741   Mean   :102601                  ProfExe: 900   Mean   : 8.876  
+ 3rd Qu.:0.0000   3rd Qu.:23100   3rd Qu.: 91688   3rd Qu.:120451                  Sales  :  79   3rd Qu.:13.000  
+ Max.   :1.0000   Max.   :89900   Max.   :399412   Max.   :855909                  Self   : 139   Max.   :41.000  
+                                  NA's   :353      NA's   :79                      NA's   : 196   NA's   :354     
+     DEROG            DELINQ            CLAGE            NINQ             CLNO          DEBTINC        
+ Min.   :0.0000   Min.   : 0.0000   Min.   :  0.0   Min.   : 0.000   Min.   : 0.00   Min.   :  0.5245  
+ 1st Qu.:0.0000   1st Qu.: 0.0000   1st Qu.:115.1   1st Qu.: 0.000   1st Qu.:14.50   1st Qu.: 29.2090  
+ Median :0.0000   Median : 0.0000   Median :173.2   Median : 1.000   Median :20.00   Median : 34.9835  
+ Mean   :0.2456   Mean   : 0.4435   Mean   :179.1   Mean   : 1.189   Mean   :21.38   Mean   : 33.8053  
+ 3rd Qu.:0.0000   3rd Qu.: 0.0000   3rd Qu.:230.7   3rd Qu.: 2.000   3rd Qu.:26.00   3rd Qu.: 39.0728  
+ Max.   :9.0000   Max.   :13.0000   Max.   :649.7   Max.   :17.000   Max.   :71.00   Max.   :144.1890  
+ NA's   :508      NA's   :418       NA's   :220     NA's   :364      NA's   :165     NA's   :875       
+ MISS_CRED_INFO
+ 0:4007        
+ 1: 165        
+               
+               
+               
+               
+               
+
+Training data missing pattern for selected credit-history variables:
+     CLNO CLAGE NINQ DELINQ DEROG     
+3513    1     1    1      1     1    0
+125     1     1    1      1     0    1
+15      1     1    1      0     1    1
+100     1     1    1      0     0    2
+39      1     1    0      1     1    1
+22      1     1    0      1     0    2
+42      1     1    0      0     1    2
+96      1     1    0      0     0    3
+55      1     0    1      1     1    1
+165     0     0    0      0     0    5
+      165   220  364    418   508 1675
+
+Test data class proportions (%):
+
+    0     1 
+79.64 20.36 
+
+Testing data summary:
+      BAD              LOAN          MORTDUE           VALUE            REASON          JOB           YOJ        
+ Min.   :0.0000   Min.   : 1100   Min.   :  4734   Min.   :  8000   DebtCon:1187   Mgr    :233   Min.   : 0.000  
+ 1st Qu.:0.0000   1st Qu.:11000   1st Qu.: 46598   1st Qu.: 65141   HomeImp: 531   Office :290   1st Qu.: 3.000  
+ Median :0.0000   Median :16450   Median : 65876   Median : 89200   NA's   :  70   Other  :722   Median : 7.000  
+ Mean   :0.2036   Mean   :18575   Mean   : 73808   Mean   : 99853                  ProfExe:376   Mean   : 9.032  
+ 3rd Qu.:0.0000   3rd Qu.:23700   3rd Qu.: 90985   3rd Qu.:118725                  Sales  : 30   3rd Qu.:13.000  
+ Max.   :1.0000   Max.   :88900   Max.   :399550   Max.   :512650                  Self   : 54   Max.   :36.000  
+                                  NA's   :165      NA's   :33                      NA's   : 83   NA's   :161     
+     DEROG             DELINQ            CLAGE               NINQ             CLNO          DEBTINC       
+ Min.   : 0.0000   Min.   : 0.0000   Min.   :  0.4867   Min.   : 0.000   Min.   : 0.00   Min.   :  1.909  
+ 1st Qu.: 0.0000   1st Qu.: 0.0000   1st Qu.:114.8341   1st Qu.: 0.000   1st Qu.:15.00   1st Qu.: 28.891  
+ Median : 0.0000   Median : 0.0000   Median :173.9346   Median : 1.000   Median :20.00   Median : 34.518  
+ Mean   : 0.2752   Mean   : 0.4631   Mean   :179.8391   Mean   : 1.178   Mean   :21.09   Mean   : 33.720  
+ 3rd Qu.: 0.0000   3rd Qu.: 0.0000   3rd Qu.:232.2566   3rd Qu.: 2.000   3rd Qu.:26.00   3rd Qu.: 38.866  
+ Max.   :10.0000   Max.   :15.0000   Max.   :628.9819   Max.   :11.000   Max.   :58.00   Max.   :203.312  
+ NA's   :200       NA's   :162       NA's   :88         NA's   :146      NA's   :57      NA's   :392      
+ MISS_CRED_INFO
+ 0:1731        
+ 1:  57        
+               
+               
+               
+               
+               
+
+------------ MISSING DATA IMPUTATION ------------
+Running missRanger imputation...
+Missing value imputation by random forests
+
+Variables to impute:		VALUE, CLNO, REASON, JOB, CLAGE, MORTDUE, YOJ, NINQ, DELINQ, DEROG, DEBTINC
+Variables used to impute:	LOAN, MORTDUE, VALUE, REASON, JOB, YOJ, DEROG, DELINQ, CLAGE, NINQ, CLNO, DEBTINC, MISS_CRED_INFO
+
+iter 1 
+  |=========================================================================================================| 100%
+iter 2 
+  |=========================================================================================================| 100%
+iter 3 
+  |=========================================================================================================| 100%
+missRanger imputation completed.
+
+Correlation matrix - Original data:
+          BAD  LOAN MORTDUE VALUE   YOJ DEROG DELINQ CLAGE  NINQ  CLNO DEBTINC
+BAD      1.00 -0.03   -0.01 -0.02 -0.06  0.25   0.28 -0.13  0.13  0.04    0.24
+LOAN    -0.03  1.00    0.22  0.35  0.13 -0.03  -0.05  0.05  0.03  0.05    0.15
+MORTDUE -0.01  0.22    1.00  0.87 -0.11 -0.03  -0.04  0.14  0.05  0.32    0.19
+VALUE   -0.02  0.35    0.87  1.00 -0.02 -0.04  -0.06  0.21  0.01  0.22    0.14
+YOJ     -0.06  0.13   -0.11 -0.02  1.00 -0.05   0.03  0.21 -0.07 -0.01   -0.05
+DEROG    0.25 -0.03   -0.03 -0.04 -0.05  1.00   0.16 -0.07  0.20  0.09    0.06
+DELINQ   0.28 -0.05   -0.04 -0.06  0.03  0.16   1.00  0.01  0.00  0.12    0.01
+CLAGE   -0.13  0.05    0.14  0.21  0.21 -0.07   0.01  1.00 -0.12  0.22   -0.06
+NINQ     0.13  0.03    0.05  0.01 -0.07  0.20   0.00 -0.12  1.00  0.08    0.18
+CLNO     0.04  0.05    0.32  0.22 -0.01  0.09   0.12  0.22  0.08  1.00    0.16
+DEBTINC  0.24  0.15    0.19  0.14 -0.05  0.06   0.01 -0.06  0.18  0.16    1.00
+
+Correlation matrix - missRanger imputed data:
+         LOAN MORTDUE VALUE   YOJ DEROG DELINQ CLAGE  NINQ CLNO DEBTINC   BAD
+LOAN     1.00    0.23  0.34  0.13 -0.02  -0.05  0.08  0.04 0.08    0.11 -0.07
+MORTDUE  0.23    1.00  0.85 -0.09 -0.05  -0.02  0.13  0.04 0.35    0.21 -0.03
+VALUE    0.34    0.85  1.00  0.00 -0.07  -0.03  0.17  0.00 0.26    0.16 -0.02
+YOJ      0.13   -0.09  0.00  1.00 -0.07   0.03  0.21 -0.09 0.03   -0.05 -0.06
+DEROG   -0.02   -0.05 -0.07 -0.07  1.00   0.25 -0.07  0.19 0.07    0.03  0.23
+DELINQ  -0.05   -0.02 -0.03  0.03  0.25   1.00  0.03  0.08 0.14    0.02  0.32
+CLAGE    0.08    0.13  0.17  0.21 -0.07   0.03  1.00 -0.14 0.27   -0.04 -0.17
+NINQ     0.04    0.04  0.00 -0.09  0.19   0.08 -0.14  1.00 0.08    0.17  0.17
+CLNO     0.08    0.35  0.26  0.03  0.07   0.14  0.27  0.08 1.00    0.23  0.01
+DEBTINC  0.11    0.21  0.16 -0.05  0.03   0.02 -0.04  0.17 0.23    1.00  0.16
+BAD     -0.07   -0.03 -0.02 -0.06  0.23   0.32 -0.17  0.17 0.01    0.16  1.00
+
+------------ TEST DATA IMPUTATION ------------
+Missing values in test data before imputation:
+           BAD           LOAN        MORTDUE          VALUE         REASON            JOB            YOJ 
+             0              0            165             33             70             83            161 
+         DEROG         DELINQ          CLAGE           NINQ           CLNO        DEBTINC MISS_CRED_INFO 
+           200            162             88            146             57            392              0 
+
+Missing values in test data after imputation:
+           BAD           LOAN        MORTDUE          VALUE         REASON            JOB            YOJ 
+             0              0              0              0              0              0              0 
+         DEROG         DELINQ          CLAGE           NINQ           CLNO        DEBTINC MISS_CRED_INFO 
+             0              0              0              0              0              0              0 
+
+Summary of imputed test data:
+      BAD              LOAN          MORTDUE           VALUE            REASON          JOB           YOJ        
+ Min.   :0.0000   Min.   : 1100   Min.   :  4734   Min.   :  8000   DebtCon:1242   Mgr    :235   Min.   : 0.000  
+ 1st Qu.:0.0000   1st Qu.:11000   1st Qu.: 42316   1st Qu.: 65272   HomeImp: 546   Office :292   1st Qu.: 4.000  
+ Median :0.0000   Median :16450   Median : 62536   Median : 89220                  Other  :778   Median : 8.000  
+ Mean   :0.2036   Mean   :18575   Mean   : 70941   Mean   :100008                  ProfExe:399   Mean   : 9.091  
+ 3rd Qu.:0.0000   3rd Qu.:23700   3rd Qu.: 88932   3rd Qu.:118919                  Sales  : 30   3rd Qu.:13.000  
+ Max.   :1.0000   Max.   :88900   Max.   :399550   Max.   :512650                  Self   : 54   Max.   :36.000  
+     DEROG             DELINQ            CLAGE               NINQ             CLNO          DEBTINC       
+ Min.   : 0.0000   Min.   : 0.0000   Min.   :  0.4867   Min.   : 0.000   Min.   : 0.00   Min.   :  1.909  
+ 1st Qu.: 0.0000   1st Qu.: 0.0000   1st Qu.:115.4910   1st Qu.: 0.000   1st Qu.:15.00   1st Qu.: 29.711  
+ Median : 0.0000   Median : 0.0000   Median :171.7591   Median : 1.000   Median :20.00   Median : 34.717  
+ Mean   : 0.3194   Mean   : 0.5224   Mean   :178.6175   Mean   : 1.221   Mean   :21.17   Mean   : 33.882  
+ 3rd Qu.: 0.0000   3rd Qu.: 1.0000   3rd Qu.:228.2812   3rd Qu.: 2.000   3rd Qu.:26.00   3rd Qu.: 38.427  
+ Max.   :10.0000   Max.   :15.0000   Max.   :628.9819   Max.   :11.000   Max.   :58.00   Max.   :203.312  
+ MISS_CRED_INFO
+ 0:1731        
+ 1:  57        
+               
+               
+               
+               
+
+------------ LTV CREATION ------------
+Summary of LTV in training data:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+0.01518 0.12175 0.16892 0.21508 0.24154 1.76000 
+
+Correlation of LTV with numeric predictors:
+   LOAN MORTDUE   VALUE     YOJ   DEROG  DELINQ   CLAGE    NINQ    CLNO DEBTINC     BAD     LTV 
+   0.60   -0.36   -0.35    0.10    0.09   -0.04   -0.09    0.06   -0.16   -0.06   -0.04    1.00 
+
+------------ SCALING AND DUMMY VARIABLES ------------
+Training data after scaling and dummy encoding:
+Dimensions: 4172 rows and 19 columns
+
+Testing data after scaling and dummy encoding:
+Dimensions: 1788 rows and 19 columns
+
+------------ K-MEANS CLUSTERING: ALL INPUTS ------------
+Cluster sizes:
+[1] 1418  952 1802
+
+Cluster centers:
+       LOAN   MORTDUE      VALUE       YOJ      DEROG     DELINQ     CLAGE       NINQ      CLNO   DEBTINC
+1 0.2027925 0.1826801 0.11480681 0.2094499 0.03322363 0.04399479 0.2743200 0.07122708 0.3148851 0.2395821
+2 0.1974908 0.2322587 0.14339921 0.2089568 0.02287582 0.03781513 0.3009218 0.05832921 0.3414309 0.2235486
+3 0.1887287 0.1365162 0.08989003 0.2298801 0.03736589 0.03931529 0.2605965 0.07948685 0.2692392 0.2308610
+  JOB_Office JOB_Other JOB_ProfExe  JOB_Sales   JOB_Self REASON_HomeImp MISS_CRED_INFO       LTV       BAD
+1  0.4647391         0           0 0.05571227 0.09802539      0.3145275     0.01833568 0.2067025 0.1967560
+2  0.0000000         0           1 0.00000000 0.00000000      0.3161765     0.05987395 0.1655211 0.1565126
+3  0.0000000         1           0 0.00000000 0.00000000      0.3085461     0.04550499 0.2478575 0.2203108
+
+Cluster summary (all scaled inputs):
+# A tibble: 3 × 6
+  cluster_all count default current default_per Miss_cred
+        <int> <int>   <int>   <int>       <dbl>     <dbl>
+1           1  1418     279    1139        19.7      1.83
+2           2   952     149     803        15.7      5.99
+3           3  1802     397    1405        22.0      4.55
+
+Numeric cluster profiles:
+# A tibble: 3 × 13
+  cluster_all   LOAN MORTDUE   VALUE   YOJ DEROG DELINQ CLAGE  NINQ  CLNO DEBTINC   BAD   LTV
+        <int>  <dbl>   <dbl>   <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl> <dbl>
+1           1 19267.  74651. 106054.  8.59 0.299  0.572  178. 1.21   22.4    34.9 0.197 0.207
+2           2 18798.  94351. 130275.  8.57 0.206  0.492  196. 0.992  24.2    32.6 0.157 0.166
+3           3 18021.  56308.  84947.  9.43 0.336  0.511  169. 1.35   19.1    33.7 0.220 0.248
+
+Cluster distribution by REASON:
+# A tibble: 6 × 3
+  cluster_all REASON      n
+        <int> <fct>   <int>
+1           1 DebtCon   972
+2           1 HomeImp   446
+3           2 DebtCon   651
+4           2 HomeImp   301
+5           3 DebtCon  1246
+6           3 HomeImp   556
+
+Cluster distribution by JOB:
+# A tibble: 6 × 3
+  cluster_all JOB         n
+        <int> <fct>   <int>
+1           1 Mgr       541
+2           1 Office    659
+3           1 Sales      79
+4           1 Self      139
+5           2 ProfExe   952
+6           3 Other    1802
+
+------------ K-MEANS CLUSTERING: NUMERIC RISK VARIABLES ONLY ------------
+Cluster sizes:
+[1] 1183 2106  883
+
+Cluster centers:
+       LOAN   MORTDUE      VALUE       YOJ      DEROG     DELINQ     CLAGE       NINQ      CLNO   DEBTINC
+1 0.2518886 0.2708589 0.16709935 0.1604849 0.03446980 0.04636192 0.3204403 0.07637611 0.4268451 0.2473602
+2 0.1523418 0.1320779 0.08217881 0.1354666 0.03872534 0.03747535 0.2198935 0.07924138 0.2316721 0.2258964
+3 0.2229267 0.1444742 0.10254456 0.4926664 0.01572921 0.04016029 0.3430143 0.04816468 0.2988212 0.2267183
+
+Cluster summary (numeric-only inputs):
+# A tibble: 3 × 6
+  cluster_num count default current default_per Miss_cred
+        <int> <int>   <int>   <int>       <dbl>     <dbl>
+1           1  1183     213     970        18.0     2.79 
+2           2  2106     487    1619        23.1     5.89 
+3           3   883     125     758        14.2     0.906
+
+Numeric means by cluster:
+# A tibble: 3 × 14
+  cluster_num   LOAN MORTDUE   VALUE   YOJ DEROG DELINQ CLAGE  NINQ  CLNO DEBTINC   BAD   LTV cluster_all
+        <int>  <dbl>   <dbl>   <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl> <dbl>       <dbl>
+1           1 23617. 109689. 150351.  6.58 0.310  0.603  208. 1.30   30.3    36.1 0.180 0.182        1.83
+2           2 14797.  54544.  78414.  5.55 0.349  0.487  143. 1.35   16.4    33.0 0.231 0.218        2.20
+3           3 21051.  59470.  95666. 20.2  0.142  0.522  223. 0.819  21.2    33.1 0.142 0.252        2.20
+
+Numeric-only cluster distribution by REASON:
+# A tibble: 6 × 3
+  cluster_num REASON      n
+        <int> <fct>   <int>
+1           1 DebtCon   858
+2           1 HomeImp   325
+3           2 DebtCon  1442
+4           2 HomeImp   664
+5           3 DebtCon   569
+6           3 HomeImp   314
+
+Numeric-only cluster distribution by JOB:
+# A tibble: 18 × 3
+   cluster_num JOB         n
+         <int> <fct>   <int>
+ 1           1 Mgr       208
+ 2           1 Office    175
+ 3           1 Other     285
+ 4           1 ProfExe   407
+ 5           1 Sales      26
+ 6           1 Self       82
+ 7           2 Mgr       222
+ 8           2 Office    341
+ 9           2 Other    1067
+10           2 ProfExe   386
+11           2 Sales      41
+12           2 Self       49
+13           3 Mgr       111
+14           3 Office    143
+15           3 Other     450
+16           3 ProfExe   159
+17           3 Sales      12
+18           3 Self        8
+
+Comparing average silhouette width for different k values...
+------------ FINAL TWO-CLUSTER SOLUTION ------------
+Final k=2 clustering completed.
+Cluster sizes:
+[1] 1174 2998
+
+Cluster centers:
+       LOAN   MORTDUE     VALUE       YOJ      DEROG     DELINQ     CLAGE       NINQ      CLNO   DEBTINC
+1 0.2445182 0.1699651 0.1190964 0.4444052 0.01760363 0.04127899 0.3348713 0.05145806 0.3243636 0.2320033
+2 0.1763162 0.1756550 0.1072297 0.1295661 0.03854421 0.04028327 0.2508070 0.07983754 0.2921666 0.2322166
+
+Final cluster summary:
+# A tibble: 2 × 6
+  cluster_final count default current default_per Miss_cred
+          <int> <int>   <int>   <int>       <dbl>     <dbl>
+1             1  1174     185     989        15.8     0.937
+2             2  2998     640    2358        21.3     5.14 
+
+Average numeric values for final clusters:
+# A tibble: 2 × 15
+  cluster_final   LOAN MORTDUE   VALUE   YOJ DEROG DELINQ CLAGE  NINQ  CLNO DEBTINC   BAD   LTV cluster_all
+          <int>  <dbl>   <dbl>   <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl> <dbl>       <dbl>
+1             1 22964.  69598. 109688. 18.2  0.158  0.537  218. 0.875  23.0    33.9 0.158 0.246        2.10
+2             2 16922.  71859.  99635.  5.31 0.347  0.524  163. 1.36   20.7    33.9 0.213 0.203        2.09
+# ℹ 1 more variable: cluster_num <dbl>
+
+Final cluster distribution by REASON:
+# A tibble: 4 × 3
+  cluster_final REASON      n
+          <int> <fct>   <int>
+1             1 DebtCon   772
+2             1 HomeImp   402
+3             2 DebtCon  2097
+4             2 HomeImp   901
+
+Final cluster distribution by JOB:
+# A tibble: 12 × 3
+   cluster_final JOB         n
+           <int> <fct>   <int>
+ 1             1 Mgr       157
+ 2             1 Office    199
+ 3             1 Other     527
+ 4             1 ProfExe   241
+ 5             1 Sales      14
+ 6             1 Self       36
+ 7             2 Mgr       384
+ 8             2 Office    460
+ 9             2 Other    1275
+10             2 ProfExe   711
+11             2 Sales      65
+12             2 Self      103
+
+------------ REGRESSION Analysis: PREDICT LTV ------------
+Summary of full regression model:
+
+Call:
+lm(formula = LTV ~ ., data = regr_train_hmeq)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.32547 -0.08407 -0.02920  0.03429  1.54573 
+
+Coefficients:
+                  Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)      0.3139462  0.0141523  22.183 < 0.0000000000000002 ***
+MORTDUE         -0.4717132  0.0236032 -19.985 < 0.0000000000000002 ***
+YOJ              0.0920833  0.0132928   6.927     0.00000000000495 ***
+DEROG            0.1481001  0.0271718   5.451     0.00000005313792 ***
+DELINQ          -0.1018051  0.0287422  -3.542             0.000401 ***
+CLAGE           -0.0277813  0.0194210  -1.430             0.152656    
+NINQ             0.0716170  0.0242381   2.955             0.003147 ** 
+CLNO            -0.0543562  0.0184535  -2.946             0.003241 ** 
+DEBTINC         -0.0256090  0.0472207  -0.542             0.587624    
+MISS_CRED_INFO1 -0.0584844  0.0120008  -4.873     0.00000113808495 ***
+JOB_Office       0.0006984  0.0086330   0.081             0.935528    
+JOB_Other        0.0185470  0.0073674   2.517             0.011858 *  
+JOB_ProfExe     -0.0070442  0.0081051  -0.869             0.384843    
+JOB_Sales       -0.0357335  0.0178361  -2.003             0.045195 *  
+JOB_Self         0.0637205  0.0141877   4.491     0.00000727266613 ***
+REASON_HomeImp  -0.0589323  0.0050808 -11.599 < 0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1471 on 4156 degrees of freedom
+Multiple R-squared:  0.1891,	Adjusted R-squared:  0.1862 
+F-statistic: 64.61 on 15 and 4156 DF,  p-value: < 0.00000000000000022
+
+
+Loading required package: carData
+
+Attaching package: ‘car’
+
+The following object is masked from ‘package:arules’:
+
+    recode
+
+The following object is masked from ‘package:dplyr’:
+
+    recode
+VIF values for full regression model:
+       MORTDUE            YOJ          DEROG         DELINQ          CLAGE           NINQ           CLNO 
+      1.333436       1.082524       1.122219       1.113012       1.174989       1.116079       1.324910 
+       DEBTINC MISS_CRED_INFO     JOB_Office      JOB_Other    JOB_ProfExe      JOB_Sales       JOB_Self 
+      1.154166       1.054128       1.910070       2.566238       2.229368       1.138767       1.249205 
+REASON_HomeImp 
+      1.068349 
+
+Start:  AIC=-15973.97
+LTV ~ MORTDUE + YOJ + DEROG + DELINQ + CLAGE + NINQ + CLNO + 
+    DEBTINC + MISS_CRED_INFO + JOB_Office + JOB_Other + JOB_ProfExe + 
+    JOB_Sales + JOB_Self + REASON_HomeImp
+
+                 Df Sum of Sq    RSS    AIC
+- JOB_Office      1    0.0001 89.984 -15976
+- DEBTINC         1    0.0064 89.990 -15976
+- JOB_ProfExe     1    0.0164 90.000 -15975
+<none>                        89.984 -15974
+- CLAGE           1    0.0443 90.028 -15974
+- JOB_Sales       1    0.0869 90.071 -15972
+- JOB_Other       1    0.1372 90.121 -15970
+- CLNO            1    0.1879 90.172 -15967
+- NINQ            1    0.1890 90.173 -15967
+- DELINQ          1    0.2716 90.255 -15963
+- JOB_Self        1    0.4367 90.421 -15956
+- MISS_CRED_INFO  1    0.5142 90.498 -15952
+- DEROG           1    0.6432 90.627 -15946
+- YOJ             1    1.0390 91.023 -15928
+- REASON_HomeImp  1    2.9129 92.897 -15843
+- MORTDUE         1    8.6478 98.632 -15593
+
+Step:  AIC=-15975.96
+LTV ~ MORTDUE + YOJ + DEROG + DELINQ + CLAGE + NINQ + CLNO + 
+    DEBTINC + MISS_CRED_INFO + JOB_Other + JOB_ProfExe + JOB_Sales + 
+    JOB_Self + REASON_HomeImp
+
+                 Df Sum of Sq    RSS    AIC
+- DEBTINC         1    0.0064 89.990 -15978
+- JOB_ProfExe     1    0.0272 90.011 -15977
+<none>                        89.984 -15976
+- CLAGE           1    0.0442 90.028 -15976
++ JOB_Office      1    0.0001 89.984 -15974
+- JOB_Sales       1    0.0956 90.080 -15974
+- CLNO            1    0.1879 90.172 -15969
+- NINQ            1    0.1890 90.173 -15969
+- JOB_Other       1    0.2283 90.212 -15967
+- DELINQ          1    0.2720 90.256 -15965
+- JOB_Self        1    0.4848 90.469 -15956
+- MISS_CRED_INFO  1    0.5152 90.499 -15954
+- DEROG           1    0.6441 90.628 -15948
+- YOJ             1    1.0399 91.024 -15930
+- REASON_HomeImp  1    2.9148 92.899 -15845
+- MORTDUE         1    8.7238 98.708 -15592
+
+Step:  AIC=-15977.66
+LTV ~ MORTDUE + YOJ + DEROG + DELINQ + CLAGE + NINQ + CLNO + 
+    MISS_CRED_INFO + JOB_Other + JOB_ProfExe + JOB_Sales + JOB_Self + 
+    REASON_HomeImp
+
+                 Df Sum of Sq    RSS    AIC
+- JOB_ProfExe     1    0.0241 90.014 -15978
+- CLAGE           1    0.0420 90.032 -15978
+<none>                        89.990 -15978
++ DEBTINC         1    0.0064 89.984 -15976
++ JOB_Office      1    0.0002 89.990 -15976
+- JOB_Sales       1    0.0960 90.086 -15975
+- NINQ            1    0.1832 90.174 -15971
+- CLNO            1    0.2066 90.197 -15970
+- JOB_Other       1    0.2298 90.220 -15969
+- DELINQ          1    0.2722 90.263 -15967
+- JOB_Self        1    0.4871 90.477 -15957
+- MISS_CRED_INFO  1    0.5090 90.499 -15956
+- DEROG           1    0.6449 90.635 -15950
+- YOJ             1    1.0427 91.033 -15932
+- REASON_HomeImp  1    2.9089 92.899 -15847
+- MORTDUE         1    9.0760 99.066 -15579
+
+Step:  AIC=-15978.55
+LTV ~ MORTDUE + YOJ + DEROG + DELINQ + CLAGE + NINQ + CLNO + 
+    MISS_CRED_INFO + JOB_Other + JOB_Sales + JOB_Self + REASON_HomeImp
+
+                 Df Sum of Sq    RSS    AIC
+<none>                        90.014 -15978
+- CLAGE           1    0.0452 90.060 -15978
++ JOB_ProfExe     1    0.0241 89.990 -15978
++ JOB_Office      1    0.0100 90.004 -15977
+- JOB_Sales       1    0.0830 90.097 -15977
++ DEBTINC         1    0.0033 90.011 -15977
+- NINQ            1    0.1894 90.204 -15972
+- CLNO            1    0.2097 90.224 -15971
+- DELINQ          1    0.2662 90.281 -15968
+- JOB_Other       1    0.3872 90.402 -15963
+- MISS_CRED_INFO  1    0.5330 90.547 -15956
+- JOB_Self        1    0.5663 90.581 -15954
+- DEROG           1    0.6510 90.665 -15950
+- YOJ             1    1.0484 91.063 -15932
+- REASON_HomeImp  1    2.9209 92.935 -15847
+- MORTDUE         1    9.5054 99.520 -15562
+Summary of stepwise regression model:
+
+Call:
+lm(formula = LTV ~ MORTDUE + YOJ + DEROG + DELINQ + CLAGE + NINQ + 
+    CLNO + MISS_CRED_INFO + JOB_Other + JOB_Sales + JOB_Self + 
+    REASON_HomeImp, data = regr_train_hmeq)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.32315 -0.08454 -0.02926  0.03425  1.54069 
+
+Coefficients:
+                 Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)      0.307090   0.008483  36.201 < 0.0000000000000002 ***
+MORTDUE         -0.478209   0.022819 -20.957 < 0.0000000000000002 ***
+YOJ              0.092387   0.013274   6.960     0.00000000000394 ***
+DEROG            0.148727   0.027118   5.485     0.00000004391974 ***
+DELINQ          -0.100680   0.028708  -3.507             0.000458 ***
+CLAGE           -0.027954   0.019336  -1.446             0.148335    
+NINQ             0.070952   0.023987   2.958             0.003114 ** 
+CLNO            -0.056529   0.018160  -3.113             0.001865 ** 
+MISS_CRED_INFO1 -0.059013   0.011892  -4.962     0.00000072432928 ***
+JOB_Other        0.020949   0.004953   4.230     0.00002392282625 ***
+JOB_Sales       -0.033181   0.016944  -1.958             0.050264 .  
+JOB_Self         0.066675   0.013034   5.115     0.00000032724885 ***
+REASON_HomeImp  -0.058936   0.005073 -11.617 < 0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1471 on 4159 degrees of freedom
+Multiple R-squared:  0.1888,	Adjusted R-squared:  0.1865 
+F-statistic: 80.67 on 12 and 4159 DF,  p-value: < 0.00000000000000022
+
+
+Stepwise regression performance metrics:
+                 ME      RMSE       MAE       MPE    MAPE
+Test set 0.00222336 0.1547299 0.0931639 -31.73609 55.1818
+
+Correlation between predicted and actual LTV (stepwise model):
+[1] 0.3969285
+
+------------ REGRESSION MODEL IMPROVEMENT ------------
+Summary of improved regression model:
+
+Call:
+lm(formula = LTV ~ log_MORTDUE + DEROG + DELINQ + CLAGE + NINQ + 
+    CLNO + REASON_HomeImp + JOB_Other + JOB_Self + MISS_CRED_INFO, 
+    data = regr_train_hmeq)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.49086 -0.07573 -0.02249  0.03869  1.54821 
+
+Coefficients:
+                 Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)      1.475885   0.041651  35.435 < 0.0000000000000002 ***
+log_MORTDUE     -0.112835   0.003804 -29.663 < 0.0000000000000002 ***
+DEROG            0.097315   0.026137   3.723             0.000199 ***
+DELINQ          -0.094139   0.027610  -3.410             0.000657 ***
+CLAGE           -0.043746   0.018290  -2.392             0.016812 *  
+NINQ             0.056377   0.023060   2.445             0.014533 *  
+CLNO             0.001895   0.017684   0.107             0.914685    
+REASON_HomeImp  -0.062031   0.004883 -12.704 < 0.0000000000000002 ***
+JOB_Other        0.016372   0.004731   3.461             0.000544 ***
+JOB_Self         0.052627   0.012528   4.201          0.000027157 ***
+MISS_CRED_INFO1 -0.059046   0.011448  -5.158          0.000000262 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1418 on 4161 degrees of freedom
+Multiple R-squared:  0.246,	Adjusted R-squared:  0.2442 
+F-statistic: 135.7 on 10 and 4161 DF,  p-value: < 0.00000000000000022
+
+
+First few actual vs predicted LTV values:
+     Actuals Predictions Error
+1 0.02818706        0.28 -0.25
+2 0.04216270        0.26 -0.22
+3 0.02504472        0.15 -0.13
+4 0.02144250        0.10 -0.08
+5 0.04449858        0.23 -0.18
+6 0.03269978        0.20 -0.17
+
+`stat_bin()` using `bins = 30`. Pick better value `binwidth`.
+Negative predictions: 5 
+Predictions above 2: 0 
+
+Improved regression model performance metrics:
+                  ME      RMSE        MAE       MPE     MAPE
+Test set 0.003427515 0.1477421 0.08812228 -28.36963 50.72561
+
+Correlation between actual and adjusted predictions:
+[1] 0.4815949
+
+
+-------- Regression Tree-----------
+n= 4172 
+
+node), split, n, deviance, yval
+      * denotes terminal node
+
+  1) root 4172 110.96710000 0.21508140  
+    2) MORTDUE>=42745.74 3136  43.53763000 0.17204260  
+      4) MORTDUE>=65210.5 1928  14.60793000 0.14780300  
+        8) MORTDUE< 232314.5 1887   9.91752400 0.14520780 *
+        9) MORTDUE>=232314.5 41   4.09278700 0.26724420  
+         18) JOB=Other,ProfExe,Self 30   0.01296448 0.09657861 *
+         19) JOB=Mgr 11   0.82292470 0.73269560 *
+      5) MORTDUE< 65210.5 1208  25.98889000 0.21072960 *
+    3) MORTDUE< 42745.74 1036  44.03675000 0.34536100  
+      6) REASON=HomeImp 418  14.25776000 0.26891090  
+       12) YOJ< 25.5 394  11.58393000 0.25609300 *
+       13) YOJ>=25.5 24   1.54639800 0.47933710  
+         26) CLAGE>=200.9878 12   0.11715110 0.23973290 *
+         27) CLAGE< 200.9878 12   0.05140231 0.71894130 *
+      7) REASON=DebtCon 618  25.68352000 0.39706990  
+       14) CLAGE>=214.2383 165   2.25046900 0.30346000 *
+       15) CLAGE< 214.2383 453  21.46055000 0.43116630  
+         30) DEROG< 4.5 440  19.26866000 0.42190410  
+           60) MORTDUE>=21186 345  14.23669000 0.39320960  
+            120) DEBTINC>=26.8394 281  10.34592000 0.36017740  
+              240) CLNO>=4 268   8.56262400 0.34468030 *
+              241) CLNO< 4 13   0.39208230 0.67965470 *
+            121) DEBTINC< 26.8394 64   2.23796100 0.53824170 *
+           61) MORTDUE< 21186 95   3.71630800 0.52611030 *
+         31) DEROG>=4.5 13   0.87656260 0.74465540 *
+
+Cp Table:
+
+Regression tree:
+rpart(formula = LTV ~ ., data = train_hmeq_mR_imp[, reg_vars], 
+    method = "anova")
+
+Variables actually used in tree construction:
+[1] CLAGE   CLNO    DEBTINC DEROG   JOB     MORTDUE REASON  YOJ    
+
+Root node error: 110.97/4172 = 0.026598
+
+n= 4172 
+
+        CP nsplit rel error  xerror     xstd
+1 0.210808      0   1.00000 1.00026 0.053742
+2 0.036907      1   0.78919 0.79191 0.050631
+3 0.026502      2   0.75229 0.75631 0.050212
+4 0.017776      3   0.72578 0.74310 0.049533
+5 0.017368      4   0.70801 0.74501 0.049550
+6 0.012868      6   0.67327 0.71774 0.048591
+7 0.012537      9   0.63467 0.70512 0.048368
+8 0.011288     10   0.62213 0.68531 0.046474
+9 0.010000     12   0.59955 0.66690 0.044035
+
+Regression Tree Performance Metrics:
+                  ME      RMSE        MAE       MPE     MAPE
+Test set 0.002187274 0.1395436 0.08219589 -28.29859 49.58308
+
+Correlation between test pred and actuals
+:[1] 0.5646878
+
+Correlation between train pred and actuals
+:[1] 0.6328079
+
+-------- Pruning Regression Tree-----------
+n= 4172 
+
+node), split, n, deviance, yval
+      * denotes terminal node
+
+  1) root 4172 110.96710000 0.21508140  
+    2) MORTDUE>=42745.74 3136  43.53763000 0.17204260  
+      4) MORTDUE>=65210.5 1928  14.60793000 0.14780300  
+        8) MORTDUE< 232314.5 1887   9.91752400 0.14520780 *
+        9) MORTDUE>=232314.5 41   4.09278700 0.26724420  
+         18) JOB=Other,ProfExe,Self 30   0.01296448 0.09657861 *
+         19) JOB=Mgr 11   0.82292470 0.73269560 *
+      5) MORTDUE< 65210.5 1208  25.98889000 0.21072960 *
+    3) MORTDUE< 42745.74 1036  44.03675000 0.34536100  
+      6) REASON=HomeImp 418  14.25776000 0.26891090 *
+      7) REASON=DebtCon 618  25.68352000 0.39706990  
+       14) CLAGE>=214.2383 165   2.25046900 0.30346000 *
+       15) CLAGE< 214.2383 453  21.46055000 0.43116630  
+         30) DEROG< 4.5 440  19.26866000 0.42190410  
+           60) MORTDUE>=21186 345  14.23669000 0.39320960  
+            120) DEBTINC>=26.8394 281  10.34592000 0.36017740  
+              240) CLNO>=4 268   8.56262400 0.34468030 *
+              241) CLNO< 4 13   0.39208230 0.67965470 *
+            121) DEBTINC< 26.8394 64   2.23796100 0.53824170 *
+           61) MORTDUE< 21186 95   3.71630800 0.52611030 *
+         31) DEROG>=4.5 13   0.87656260 0.74465540 *
+
+Cp Table:
+
+Regression tree:
+rpart(formula = LTV ~ ., data = train_hmeq_mR_imp[, reg_vars], 
+    method = "anova", control = c(cp = 0.012, cval = 20))
+
+Variables actually used in tree construction:
+[1] CLAGE   CLNO    DEBTINC DEROG   JOB     MORTDUE REASON 
+
+Root node error: 110.97/4172 = 0.026598
+
+n= 4172 
+
+        CP nsplit rel error  xerror     xstd
+1 0.210808      0   1.00000 1.00026 0.053742
+2 0.036907      1   0.78919 0.79191 0.050631
+3 0.026502      2   0.75229 0.75631 0.050212
+4 0.017776      3   0.72578 0.74310 0.049533
+5 0.017368      4   0.70801 0.74501 0.049550
+6 0.012868      6   0.67327 0.71774 0.048591
+7 0.012537      9   0.63467 0.70512 0.048368
+8 0.012000     10   0.62213 0.69164 0.046966
+
+Regression Tree Performance Metrics:
+                   ME      RMSE        MAE       MPE     MAPE
+Test set 0.0008778313 0.1393014 0.08249792 -28.99773 50.03965
+
+Correlation between test pred and actuals
+:[1] 0.5667945
+
+Correlation between train pred and actuals
+:[1] 0.6147106
+
+------------ CLASS BALANCING FOR CLASSIFICATION ------------
+Class distribution after oversampling:
+
+   0    1 
+3347 2911 
+
+Class proportions after oversampling (%):
+
+   0    1 
+53.5 46.5 
+
+Summary of BAD=1 in balanced dataset:
+    MORTDUE           REASON          JOB            YOJ             DEROG           DELINQ           CLAGE       
+ Min.   :  2063   DebtCon:1933   Mgr    : 467   Min.   : 0.000   Min.   :0.000   Min.   : 0.000   Min.   :  0.00  
+ 1st Qu.: 38115   HomeImp: 978   Office : 303   1st Qu.: 2.000   1st Qu.:0.000   1st Qu.: 0.000   1st Qu.: 97.54  
+ Median : 59841                  Other  :1346   Median : 7.000   Median :0.000   Median : 1.000   Median :135.90  
+ Mean   : 67215                  ProfExe: 536   Mean   : 8.224   Mean   :0.652   Mean   : 1.174   Mean   :148.95  
+ 3rd Qu.: 82000                  Sales  :  94   3rd Qu.:12.000   3rd Qu.:1.000   3rd Qu.: 2.000   3rd Qu.:189.24  
+ Max.   :399412                  Self   : 165   Max.   :41.000   Max.   :9.000   Max.   :13.000   Max.   :475.80  
+      NINQ            LTV               CLNO         DEBTINC         MISS_CRED_INFO      BAD   
+ Min.   : 0.00   Min.   :0.01901   Min.   : 0.0   Min.   :  0.5245   0:2775         Min.   :1  
+ 1st Qu.: 0.00   1st Qu.:0.11489   1st Qu.:14.0   1st Qu.: 32.1058   1: 136         1st Qu.:1  
+ Median : 1.00   Median :0.16625   Median :20.0   Median : 35.7598                  Median :1  
+ Mean   : 1.79   Mean   :0.19978   Mean   :21.5   Mean   : 36.4363                  Mean   :1  
+ 3rd Qu.: 3.00   3rd Qu.:0.23046   3rd Qu.:28.0   3rd Qu.: 39.0104                  3rd Qu.:1  
+ Max.   :17.00   Max.   :1.76000   Max.   :71.0   Max.   :144.1890                  Max.   :1  
+
+Summary of BAD=1 in original imputed training dataset:
+      LOAN          MORTDUE           VALUE            REASON         JOB           YOJ            DEROG       
+ Min.   : 1300   Min.   :  2063   Min.   :  8800   DebtCon:550   Mgr    :128   Min.   : 0.00   Min.   :0.0000  
+ 1st Qu.: 9100   1st Qu.: 38115   1st Qu.: 61800   HomeImp:275   Office : 84   1st Qu.: 2.00   1st Qu.:0.0000  
+ Median :14900   Median : 59367   Median : 83000                 Other  :397   Median : 6.00   Median :0.0000  
+ Mean   :17017   Mean   : 68302   Mean   : 99772                 ProfExe:149   Mean   : 8.13   Mean   :0.6703  
+ 3rd Qu.:21700   3rd Qu.: 82859   3rd Qu.:115800                 Sales  : 28   3rd Qu.:12.00   3rd Qu.:1.0000  
+ Max.   :77400   Max.   :399412   Max.   :855909                 Self   : 39   Max.   :41.00   Max.   :9.0000  
+     DELINQ           CLAGE             NINQ             CLNO          DEBTINC         MISS_CRED_INFO BAD    
+ Min.   : 0.000   Min.   :  0.00   Min.   : 0.000   Min.   : 0.00   Min.   :  0.5245   0:787          0:  0  
+ 1st Qu.: 0.000   1st Qu.: 97.86   1st Qu.: 0.000   1st Qu.:14.00   1st Qu.: 32.1040   1: 38          1:825  
+ Median : 1.000   Median :136.53   Median : 1.000   Median :20.00   Median : 35.6844                         
+ Mean   : 1.232   Mean   :149.47   Mean   : 1.807   Mean   :21.66   Mean   : 36.2221                         
+ 3rd Qu.: 2.000   3rd Qu.:191.13   3rd Qu.: 3.000   3rd Qu.:28.00   3rd Qu.: 38.9428                         
+ Max.   :13.000   Max.   :475.80   Max.   :17.000   Max.   :71.00   Max.   :144.1890                         
+      LTV           cluster_all     cluster_num    cluster_final  
+ Min.   :0.01901   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+ 1st Qu.:0.11282   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
+ Median :0.16580   Median :2.000   Median :2.000   Median :2.000  
+ Mean   :0.20100   Mean   :2.143   Mean   :1.893   Mean   :1.776  
+ 3rd Qu.:0.22955   3rd Qu.:3.000   3rd Qu.:2.000   3rd Qu.:2.000  
+ Max.   :1.76000   Max.   :3.000   Max.   :3.000   Max.   :2.000  
+
+Correlation matrix of balanced training set:
+        MORTDUE   YOJ DEROG DELINQ CLAGE  NINQ   LTV  CLNO DEBTINC   BAD
+MORTDUE    1.00 -0.06 -0.05  -0.01  0.11  0.02 -0.33  0.31    0.23 -0.05
+YOJ       -0.06  1.00 -0.07   0.08  0.21 -0.08  0.07  0.06   -0.04 -0.06
+DEROG     -0.05 -0.07  1.00   0.20 -0.07  0.17  0.08  0.10    0.05  0.22
+DELINQ    -0.01  0.08  0.20   1.00  0.07  0.06 -0.05  0.16    0.00  0.30
+CLAGE      0.11  0.21 -0.07   0.07  1.00 -0.15 -0.06  0.29   -0.07 -0.23
+NINQ       0.02 -0.08  0.17   0.06 -0.15  1.00  0.09  0.08    0.12  0.18
+LTV       -0.33  0.07  0.08  -0.05 -0.06  0.09  1.00 -0.12   -0.06 -0.06
+CLNO       0.31  0.06  0.10   0.16  0.29  0.08 -0.12  1.00    0.25  0.01
+DEBTINC    0.23 -0.04  0.05   0.00 -0.07  0.12 -0.06  0.25    1.00  0.19
+BAD       -0.05 -0.06  0.22   0.30 -0.23  0.18 -0.06  0.01    0.19  1.00
+
+Difference in correlations: balanced - original imputed:
+        MORTDUE   YOJ DEROG DELINQ CLAGE  NINQ   LTV  CLNO DEBTINC   BAD
+MORTDUE    0.00 -0.03  0.00  -0.01  0.02  0.02 -0.03  0.04   -0.02  0.02
+YOJ       -0.03  0.00  0.00  -0.05  0.00 -0.01  0.03 -0.03   -0.01  0.00
+DEROG      0.00  0.00  0.00   0.05  0.00  0.02  0.01 -0.03   -0.02  0.01
+DELINQ    -0.01 -0.05  0.05   0.00 -0.04  0.02  0.01 -0.02    0.02  0.02
+CLAGE      0.02  0.00  0.00  -0.04  0.00  0.01 -0.03 -0.02    0.03  0.06
+NINQ       0.02 -0.01  0.02   0.02  0.01  0.00 -0.03  0.00    0.05 -0.01
+LTV       -0.03  0.03  0.01   0.01 -0.03 -0.03  0.00 -0.04    0.00  0.02
+CLNO       0.04 -0.03 -0.03  -0.02 -0.02  0.00 -0.04  0.00   -0.02  0.00
+DEBTINC   -0.02 -0.01 -0.02   0.02  0.03  0.05  0.00 -0.02    0.00 -0.03
+BAD        0.02  0.00  0.01   0.02  0.06 -0.01  0.02  0.00   -0.03  0.00
+
+------------ CLASSIFICATION STAGE: CLASSIFY BAD ------------
+------------ LOGISTIC REGRESSION MODEL ------------
+Summary of logistic regression model:
+
+Call:
+glm(formula = BAD ~ ., family = binomial, data = class_train_hmeq_bal)
+
+Coefficients:
+                     Estimate    Std. Error z value             Pr(>|z|)    
+(Intercept)     -1.3702013892  0.2051322414  -6.680 0.000000000023959475 ***
+MORTDUE         -0.0000045412  0.0000008221  -5.524 0.000000033220794185 ***
+REASONHomeImp    0.2922318180  0.0658692072   4.437 0.000009141348466350 ***
+JOBOffice       -0.6906140611  0.1139554830  -6.060 0.000000001357963974 ***
+JOBOther        -0.0168866447  0.0908066980  -0.186              0.85247    
+JOBProfExe      -0.0501122057  0.1027043618  -0.488              0.62560    
+JOBSales         1.0190728137  0.2178424577   4.678 0.000002896489663926 ***
+JOBSelf          0.4757500941  0.1674560137   2.841              0.00450 ** 
+YOJ             -0.0083546919  0.0044212622  -1.890              0.05880 .  
+DEROG            0.3918752155  0.0399412146   9.811 < 0.0000000000000002 ***
+DELINQ           0.7022099627  0.0332635320  21.111 < 0.0000000000000002 ***
+CLAGE           -0.0064426962  0.0004323689 -14.901 < 0.0000000000000002 ***
+NINQ             0.1357281775  0.0168991675   8.032 0.000000000000000962 ***
+LTV             -1.4308162927  0.2180839764  -6.561 0.000000000053501860 ***
+CLNO            -0.0105579346  0.0032404615  -3.258              0.00112 ** 
+DEBTINC          0.0687779381  0.0047450434  14.495 < 0.0000000000000002 ***
+MISS_CRED_INFO1 -0.2946004545  0.1408894504  -2.091              0.03653 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 8645.0  on 6257  degrees of freedom
+Residual deviance: 6825.3  on 6241  degrees of freedom
+AIC: 6859.3
+
+Number of Fisher Scoring iterations: 5
+
+
+Summary of predicted probabilities:
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+0.008092 0.205586 0.332667 0.387362 0.532666 0.999997 
+
+Confusion matrix for logistic regression at 0.50 cutoff:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1133  153
+         1  291  211
+                                         
+               Accuracy : 0.7517         
+                 95% CI : (0.731, 0.7716)
+    No Information Rate : 0.7964         
+    P-Value [Acc > NIR] : 1              
+                                         
+                  Kappa : 0.3289         
+                                         
+ Mcnemar's Test P-Value : 0.0000000000794
+                                         
+            Sensitivity : 0.5797         
+            Specificity : 0.7956         
+         Pos Pred Value : 0.4203         
+         Neg Pred Value : 0.8810         
+             Prevalence : 0.2036         
+         Detection Rate : 0.1180         
+   Detection Prevalence : 0.2808         
+      Balanced Accuracy : 0.6877         
+                                         
+       'Positive' Class : 1              
+                                         
+
+Setting levels: control = 0, case = 1
+Setting direction: controls < cases
+AUC for logistic regression:
+Area under the curve: 0.7757
+
+Approval Rate (%): 71.92 
+Default Rate Among Approved Borrowers (%): 11.9 
+
+Cutoff comparison table:
+  cutoff approval_rate default_rate_approved
+1   0.30      43.95973              6.615776
+2   0.35      53.18792              8.307045
+3   0.40      59.78747              9.448082
+4   0.45      65.15660             10.557940
+5   0.50      71.92394             11.897356
+6   0.55      76.84564             12.663755
+7   0.60      81.20805             13.292011
+8   0.65      85.06711             14.266930
+9   0.70      88.75839             14.933837
+
+------------ DECISION TREE MODEL ------------
+Decision tree model structure:
+n= 6258 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+  1) root 6258 2911 0 (0.53483541 0.46516459)  
+    2) DELINQ< 0.5 3982 1440 0 (0.63837268 0.36162732)  
+      4) CLAGE>=177.9315 1622  304 0 (0.81257707 0.18742293) *
+      5) CLAGE< 177.9315 2360 1136 0 (0.51864407 0.48135593)  
+       10) DEBTINC< 43.67986 2171  950 0 (0.56241363 0.43758637)  
+         20) DEROG< 0.5 1869  730 0 (0.60941680 0.39058320)  
+           40) CLAGE>=63.81667 1638  577 0 (0.64774115 0.35225885)  
+             80) LTV>=0.0940253 1417  444 0 (0.68666196 0.31333804)  
+              160) CLNO>=3.5 1335  386 0 (0.71086142 0.28913858) *
+              161) CLNO< 3.5 82   24 1 (0.29268293 0.70731707) *
+             81) LTV< 0.0940253 221   88 1 (0.39819005 0.60180995) *
+           41) CLAGE< 63.81667 231   78 1 (0.33766234 0.66233766) *
+         21) DEROG>=0.5 302   82 1 (0.27152318 0.72847682) *
+       11) DEBTINC>=43.67986 189    3 1 (0.01587302 0.98412698) *
+    3) DELINQ>=0.5 2276  805 1 (0.35369069 0.64630931)  
+      6) DELINQ< 2.5 1766  735 1 (0.41619479 0.58380521)  
+       12) CLAGE>=238.4262 240   77 0 (0.67916667 0.32083333) *
+       13) CLAGE< 238.4262 1526  572 1 (0.37483617 0.62516383)  
+         26) DEBTINC< 30.62742 366  161 0 (0.56010929 0.43989071)  
+           52) MORTDUE>=27299.38 287   96 0 (0.66550523 0.33449477) *
+           53) MORTDUE< 27299.38 79   14 1 (0.17721519 0.82278481) *
+         27) DEBTINC>=30.62742 1160  367 1 (0.31637931 0.68362069) *
+      7) DELINQ>=2.5 510   70 1 (0.13725490 0.86274510) *
+
+CP table of decision tree:
+
+Classification tree:
+rpart(formula = BAD ~ ., data = class_train_hmeq_bal, method = "class")
+
+Variables actually used in tree construction:
+[1] CLAGE   CLNO    DEBTINC DELINQ  DEROG   LTV     MORTDUE
+
+Root node error: 2911/6258 = 0.46516
+
+n= 6258 
+
+        CP nsplit rel error  xerror     xstd
+1 0.228787      0   1.00000 1.00000 0.013555
+2 0.031432      1   0.77121 0.77121 0.013034
+3 0.025764      4   0.66094 0.67365 0.012606
+4 0.015459      5   0.63518 0.63140 0.012377
+5 0.014772      6   0.61972 0.61800 0.012299
+6 0.011680     10   0.55754 0.58021 0.012063
+7 0.010000     11   0.54586 0.56304 0.011948
+
+------------ PRUNING THE DECISION TREE ------------
+n= 6258 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+  1) root 6258 2911 0 (0.53483541 0.46516459)  
+    2) DELINQ< 0.5 3982 1440 0 (0.63837268 0.36162732)  
+      4) CLAGE>=177.9315 1622  304 0 (0.81257707 0.18742293) *
+      5) CLAGE< 177.9315 2360 1136 0 (0.51864407 0.48135593)  
+       10) DEBTINC< 43.67986 2171  950 0 (0.56241363 0.43758637)  
+         20) DEROG< 0.5 1869  730 0 (0.60941680 0.39058320)  
+           40) CLAGE>=63.81667 1638  577 0 (0.64774115 0.35225885)  
+             80) LTV>=0.0940253 1417  444 0 (0.68666196 0.31333804)  
+              160) CLNO>=3.5 1335  386 0 (0.71086142 0.28913858) *
+              161) CLNO< 3.5 82   24 1 (0.29268293 0.70731707) *
+             81) LTV< 0.0940253 221   88 1 (0.39819005 0.60180995) *
+           41) CLAGE< 63.81667 231   78 1 (0.33766234 0.66233766) *
+         21) DEROG>=0.5 302   82 1 (0.27152318 0.72847682) *
+       11) DEBTINC>=43.67986 189    3 1 (0.01587302 0.98412698) *
+    3) DELINQ>=0.5 2276  805 1 (0.35369069 0.64630931)  
+      6) DELINQ< 2.5 1766  735 1 (0.41619479 0.58380521)  
+       12) CLAGE>=238.4262 240   77 0 (0.67916667 0.32083333) *
+       13) CLAGE< 238.4262 1526  572 1 (0.37483617 0.62516383)  
+         26) DEBTINC< 30.62742 366  161 0 (0.56010929 0.43989071)  
+           52) MORTDUE>=27299.38 287   96 0 (0.66550523 0.33449477) *
+           53) MORTDUE< 27299.38 79   14 1 (0.17721519 0.82278481) *
+         27) DEBTINC>=30.62742 1160  367 1 (0.31637931 0.68362069) *
+      7) DELINQ>=2.5 510   70 1 (0.13725490 0.86274510) *
+Confusion matrix for pruned tree at 0.60 cutoff:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1108  126
+         1  316  238
+                                             
+               Accuracy : 0.7528             
+                 95% CI : (0.7321, 0.7726)   
+    No Information Rate : 0.7964             
+    P-Value [Acc > NIR] : 1                  
+                                             
+                  Kappa : 0.3617             
+                                             
+ Mcnemar's Test P-Value : <0.0000000000000002
+                                             
+            Sensitivity : 0.6538             
+            Specificity : 0.7781             
+         Pos Pred Value : 0.4296             
+         Neg Pred Value : 0.8979             
+             Prevalence : 0.2036             
+         Detection Rate : 0.1331             
+   Detection Prevalence : 0.3098             
+      Balanced Accuracy : 0.7160             
+                                             
+       'Positive' Class : 1                  
+                                             
+
+Setting levels: control = 0, case = 1
+Setting direction: controls < cases
+AUC for decision tree:
+Area under the curve: 0.7625
+
+Decision Tree Approval Rate (%): 69.02 
+Decision Tree Default Rate Among Approved Borrowers (%): 10.21 
+
+------------ c50 MODEL ------------
+Confusion matrix for pruned tree at 0.60 cutoff:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1327  128
+         1   97  236
+                                             
+               Accuracy : 0.8742             
+                 95% CI : (0.8579, 0.8892)   
+    No Information Rate : 0.7964             
+    P-Value [Acc > NIR] : <0.0000000000000002
+                                             
+                  Kappa : 0.5992             
+                                             
+ Mcnemar's Test P-Value : 0.0455             
+                                             
+            Sensitivity : 0.6484             
+            Specificity : 0.9319             
+         Pos Pred Value : 0.7087             
+         Neg Pred Value : 0.9120             
+             Prevalence : 0.2036             
+         Detection Rate : 0.1320             
+   Detection Prevalence : 0.1862             
+      Balanced Accuracy : 0.7901             
+                                             
+       'Positive' Class : 1                  
+                                             
+
+Setting levels: control = 0, case = 1
+Setting direction: controls < cases
+AUC for c50 model:
+Area under the curve: 0.8343
+
+Model cutoff comparison table:
+  cutoff glm_approval_rate glm_default_rate_approved tree_approval_rate tree_default_rate_approved
+1   0.30             43.96                      6.62              60.79                       9.38
+2   0.35             53.19                      8.31              69.02                      10.21
+3   0.40             59.79                      9.45              69.02                      10.21
+4   0.45             65.16                     10.56              69.02                      10.21
+5   0.50             71.92                     11.90              69.02                      10.21
+6   0.55             76.85                     12.66              69.02                      10.21
+7   0.60             81.21                     13.29              69.02                      10.21
+8   0.65             85.07                     14.27              71.92                      11.12
+9   0.70             88.76                     14.93              87.86                      15.53
+  c50_approval_rate c50_default_rate_approved
+1             81.38                       8.8
+2             81.38                       8.8
+3             81.38                       8.8
+4             81.38                       8.8
+5             81.38                       8.8
+6             81.38                       8.8
+7             81.38                       8.8
+8             81.38                       8.8
+9             81.38                       8.8
