@@ -1,0 +1,1291 @@
+#============ INSTALL & LOAD REQUIRED PACKAGES=======
+required_packages <- c(
+  "dplyr",
+  "ggplot2",
+  "arules",
+  "caret",
+  "rpart",
+  "rattle",
+  "cluster",
+  "forecast",
+  "fastDummies",
+  "cluster",
+  "factoextra",
+  "corrplot",
+  "scales",
+  "ROCR",
+  "ROSE",
+  "pROC",
+  "rpart.plot",
+  "missRanger",
+  "mice",
+  "VIM",
+  "C50",
+  "GGally",
+  "tidyr"
+)
+
+# Install missing packages only
+new_packages <- required_packages[!(required_packages %in% installed.packages()[, "Package"])]
+
+if(length(new_packages)) {
+  install.packages(new_packages)
+}
+
+# Load all packages
+lapply(required_packages, library, character.only = TRUE)
+
+
+# Avoid scientific notation in printed output
+options(scipen = 999)
+
+# Save current plotting settings
+old_par <- par(no.readonly = TRUE) 
+
+set.seed(2026)
+#============ HOME EQUITY LOAN ANALYSIS============
+
+cat("\n===========HOME EQUITY LOAN ANALYSIS============\n")
+
+##--------- Data Loading, Structure Review, and Initial Data Quality ----------------
+
+
+cat("------------ DATA LOADING AND INITIAL REVIEW ------------\n")
+
+# Load the HMEQ dataset
+hmeq_data <- read.csv("./hmeq.csv")
+
+cat("Dimensions of dataset:", nrow(hmeq_data), "rows and", ncol(hmeq_data), "columns\n\n")
+
+# View the first few rows of the dataset
+print(head(hmeq_data))
+cat("\n")
+
+# Check the structure and data types of all variables
+cat("Structure of dataset:\n")
+str(hmeq_data)
+cat("\n")
+
+# Replace blank strings in categorical variables with NA
+hmeq_data$REASON[hmeq_data$REASON == ""] <- NA
+hmeq_data$JOB[hmeq_data$JOB == ""] <- NA
+
+# Count missing values in each variable
+cat("Missing values by variable:\n")
+print(colSums(is.na(hmeq_data)))
+cat("\n")
+
+# Compute percentage of missing values in each variable
+cat("Percentage of missing values by variable:\n")
+print(round(colSums(is.na(hmeq_data)) / nrow(hmeq_data) * 100, 2))
+cat("\n")
+
+# Check for duplicate rows
+cat("Number of unique rows:", nrow(unique(hmeq_data)), "\n")
+cat("Number of duplicate rows:", nrow(hmeq_data) - nrow(unique(hmeq_data)), "\n\n")
+
+
+##--------- Exploratory Data Analysis (EDA) ------------
+
+
+cat("------------ EXPLORATORY DATA ANALYSIS ------------\n")
+
+# Summary statistics for all variables
+cat("Summary statistics:\n")
+print(summary(hmeq_data))
+cat("\n")
+
+# Examine class distribution of the target variable BAD
+cat("Class distribution of BAD:\n")
+print(table(hmeq_data$BAD))
+cat("\n")
+
+cat("Class percentage distribution of BAD:\n")
+print(round(prop.table(table(hmeq_data$BAD)) * 100, 2))
+cat("\n")
+
+# Plot class distribution of BAD
+p_bad <- ggplot(hmeq_data, aes(factor(BAD))) + 
+  geom_bar() +
+  labs(title = "Class Distribution of BAD", x = "BAD", y = "Count")
+print(p_bad)
+
+# Continuous variables selected for visual inspection
+cont_var <- c("LOAN", "MORTDUE", "VALUE", "YOJ", "CLAGE", "DEBTINC")
+
+cat("Continuous variables selected for visual inspection:\n")
+print(cont_var)
+cat("\n")
+
+# Plot histograms for continuous variables
+par(mfrow = c(2, 3), mar = c(4, 4, 2, 1))
+for (x in cont_var) {
+  hist(hmeq_data[, x],
+       main = paste("Histogram of", x),
+       xlab = x,
+       col = "lightgray",
+       border = "white")
+}
+par(mfrow = c(1, 1))
+
+# Plot boxplots for continuous variables
+par(mfrow = c(2, 3), mar = c(4, 4, 2, 1))
+for (x in cont_var) {
+  boxplot(hmeq_data[, x],
+          main = paste("Boxplot of", x),
+          ylab = x,
+          col = "lightgray",
+          border = "black")
+}
+par(mfrow = c(1, 1))
+par(old_par)
+
+# Discrete numeric variables for distribution review
+disc_var <- c("DELINQ", "DEROG", "NINQ", "CLNO")
+
+cat("Discrete numeric variables selected for review:\n")
+print(disc_var)
+cat("\n")
+
+# Plot boxplots for discrete numeric variables
+par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+for (x in disc_var) {
+  boxplot(hmeq_data[, x],
+          main = paste("Boxplot of", x),
+          ylab = x,
+          col = "lightgray",
+          border = "black")
+}
+par(mfrow = c(1, 1))
+par(old_par)
+# Explore default behavior across DELINQ
+cat("Default behavior across DELINQ:\n")
+delinq_summary <- hmeq_data %>% 
+  group_by(DELINQ) %>% 
+  summarise(count = n(),
+            bad_borrowers = sum(BAD, na.rm = TRUE),
+            bad_borrower_pct = mean(BAD, na.rm = TRUE) * 100,
+            .groups = "drop")
+print(delinq_summary)
+cat("\n")
+
+# Explore default behavior across DEROG
+cat("Default behavior across DEROG:\n")
+derog_summary <- hmeq_data %>% 
+  group_by(DEROG) %>% 
+  summarise(count = n(),
+            bad_borrowers = sum(BAD, na.rm = TRUE),
+            bad_borrower_pct = mean(BAD, na.rm = TRUE) * 100,
+            .groups = "drop")
+print(derog_summary)
+cat("\n")
+
+# Explore default behavior across NINQ
+cat("Default behavior across NINQ:\n")
+ninq_summary <- hmeq_data %>% 
+  group_by(NINQ) %>% 
+  summarise(count = n(),
+            bad_borrowers = sum(BAD, na.rm = TRUE),
+            bad_borrower_pct = mean(BAD, na.rm = TRUE) * 100,
+            .groups = "drop")
+print(ninq_summary)
+cat("\n")
+
+# Compare borrower characteristics by BAD status
+cat("Borrower characteristics by BAD status:\n")
+bad_compare <- hmeq_data %>% 
+  group_by(factor(BAD)) %>% 
+  summarise(count = n(),
+            med_loan = median(LOAN, na.rm = TRUE),
+            delinq = sum(DELINQ, na.rm = TRUE),
+            derog = sum(DEROG, na.rm = TRUE),
+            credit_inq = sum(NINQ, na.rm = TRUE),
+            clno = mean(CLNO, na.rm = TRUE),
+            .groups = "drop")
+print(bad_compare)
+cat("\n")
+
+# Compare loan and delinquency patterns by REASON
+cat("Loan and delinquency patterns by REASON:\n")
+reason_summary <- hmeq_data %>% 
+  group_by(REASON) %>% 
+  summarise(count = n(),
+            bad_borrowers = sum(BAD, na.rm = TRUE),
+            med_loan = median(LOAN, na.rm = TRUE),
+            delinq = sum(DELINQ, na.rm = TRUE),
+            .groups = "drop")
+print(reason_summary)
+cat("\n")
+
+# Compare loan and delinquency patterns by JOB
+cat("Loan and delinquency patterns by JOB:\n")
+job_summary <- hmeq_data %>% 
+  group_by(JOB) %>% 
+  summarise(count = n(),
+            bad_borrowers = sum(BAD, na.rm = TRUE),
+            med_loan = median(LOAN, na.rm = TRUE),
+            delinq = sum(DELINQ, na.rm = TRUE),
+            .groups = "drop")
+print(job_summary)
+cat("\n")
+
+# Pairwise plot for selected numeric variables
+cat("Displaying pairwise plot for selected numeric variables...\n")
+pair_plot <- GGally::ggpairs(
+  hmeq_data[, -c(1, 5, 6, 2, 3, 4)],
+  lower = list(na = "na"),
+  upper = list(continuous = wrap("cor", size = 2), na = "na")
+)
+print(pair_plot)
+
+
+##--------- Correlation Analysis -------------
+
+
+cat("------------ CORRELATION ANALYSIS ------------\n")
+
+# Correlation matrix for numeric variables
+cor_mtrx <- cor(hmeq_data[, -c(5, 6)], use = "complete.obs")
+
+cat("Correlation matrix:\n")
+print(round(cor_mtrx, 2))
+cat("\n")
+
+# Visualize the correlation matrix
+corrplot::corrplot.mixed(cor_mtrx, order = "AOE", tl.cex = 0.66, outline = TRUE)
+
+
+##--------- Data Pre processing and Outlier Review -----------------
+
+
+cat("------------ DATA PREPROCESSING AND OUTLIER REVIEW ------------\n")
+
+# Detect potential extreme outliers using mean + 3*SD rule
+cat("Potential extreme outliers using mean + 3*SD rule:\n")
+for (x in cont_var) {
+  thres_3sd <- mean(hmeq_data[, x], na.rm = TRUE) + 3 * sd(hmeq_data[, x], na.rm = TRUE)
+  cat("Variable:", x,
+      "| Threshold:", round(thres_3sd, 2),
+      "| Max:", round(max(hmeq_data[, x], na.rm = TRUE), 2),
+      "| Outliers:", sum(hmeq_data[[x]] > thres_3sd, na.rm = TRUE), "\n")
+}
+cat("\n")
+
+# Scatterplot to inspect possible anomalies in CLNO and CLAGE
+p_clno_clage <- ggplot(hmeq_data, aes(x = CLNO, y = CLAGE, colour = factor(BAD))) +
+  geom_point() +
+  theme_minimal() +
+  geom_text(aes(label = ifelse(CLAGE == max(CLAGE, na.rm = TRUE),
+                               paste("(", CLNO, ",", CLAGE, ")"), "")),
+            hjust = 0, vjust = 1) +
+  labs(title = "CLNO vs CLAGE")
+print(p_clno_clage)
+
+# View records with the largest CLAGE values
+cat("Top records with largest CLAGE values:\n")
+print(head(hmeq_data[order(hmeq_data$CLAGE, decreasing = TRUE), ]))
+cat("\n")
+
+# Inspect cases where CLNO equals 0
+cat("Cases where CLNO = 0:\n")
+print(hmeq_data[hmeq_data$CLNO == 0 & !is.na(hmeq_data$CLNO), c("CLAGE", "CLNO")])
+cat("\n")
+
+# Replace extreme CLAGE values with 0 based on anomaly review
+hmeq_data$CLAGE[hmeq_data$CLAGE > 1150] <- 0
+cat("Replaced CLAGE values > 1150 with 0.\n\n")
+
+# Recheck selected variables for CLNO = 0 cases
+cat("Cases with CLNO = 0 after anomaly review:\n")
+print(hmeq_data[hmeq_data$CLNO == 0 & !is.na(hmeq_data$CLNO),
+                c("CLAGE", "CLNO", "DEROG", "DELINQ", "NINQ")])
+cat("\n")
+
+
+##--------- Missing Value Analysis ---------------
+
+
+cat("------------ MISSING VALUE ANALYSIS ------------\n")
+
+# Examine the overall missing data pattern
+cat("Overall missing data pattern:\n")
+na_matrix <- mice::md.pattern(hmeq_data, rotate.names = TRUE)
+print(na_matrix)
+cat("\n")
+
+# Visualize missing-value combinations
+cat("Displaying missing-value aggregation plot...\n")
+miss_aggr <- aggr(hmeq_data, prop = FALSE, numbers = TRUE, sortCombs = TRUE)
+
+# Create shadow matrix to study missingness relationships
+shadow_mat <- as.data.frame(abs(is.na(hmeq_data[, -c(1, 2)])))
+
+# Correlation among missingness indicators
+cat("Correlation among missingness indicators:\n")
+print(round(cor(shadow_mat), 2))
+cat("\n")
+
+# Correlation between observed numeric values and missingness indicators
+cat("Correlation between numeric values and missingness indicators:\n")
+print(round(cor(hmeq_data[, -c(1, 2, 5, 6)],
+                as.matrix(shadow_mat[, -c(3, 4)]),
+                use = "pairwise.complete.obs"), 2))
+cat("\n")
+
+# Review missing pattern for selected credit-history variables
+cat("Missing pattern for selected credit-history variables:\n")
+cor_na_pattern <- md.pattern(hmeq_data[, c("CLNO", "CLAGE", "NINQ", "DEROG", "DELINQ")],
+                             rotate.names = TRUE)
+print(cor_na_pattern)
+cat("\n")
+
+# Create indicator for missing credit-history information
+hmeq_data$MISS_CRED_INFO <- as.factor(ifelse(is.na(hmeq_data$CLNO) &
+                                               is.na(hmeq_data$CLAGE) &
+                                               is.na(hmeq_data$NINQ) &
+                                               is.na(hmeq_data$DEROG) &
+                                               is.na(hmeq_data$DELINQ),
+                                             1, 0))
+
+# Check distribution of the missing-credit-information indicator
+cat("Distribution of MISS_CRED_INFO:\n")
+print(table(hmeq_data$MISS_CRED_INFO))
+cat("\n")
+
+# Convert categorical variables to factor type
+hmeq_data$REASON <- as.factor(hmeq_data$REASON)
+hmeq_data$JOB <- as.factor(hmeq_data$JOB)
+
+##--------- Train-Test Split ---------------
+
+
+cat("------------ TRAIN-TEST SPLIT ------------\n")
+set.seed(2026)
+# Split data into training and testing sets using stratified sampling on BAD
+idx <- createDataPartition(hmeq_data$BAD, p = 0.7, list = FALSE)
+train_hmeq <- hmeq_data[idx, ]
+test_hmeq  <- hmeq_data[-idx, ]
+
+cat("Training set dimensions:", nrow(train_hmeq), "rows and", ncol(train_hmeq), "columns\n")
+cat("Testing set dimensions :", nrow(test_hmeq), "rows and", ncol(test_hmeq), "columns\n\n")
+
+# Check class distribution in training set
+cat("Train data class proportions (%):\n")
+print(round(prop.table(table(train_hmeq$BAD)) * 100, 2))
+cat("\n")
+
+cat("Training data summary:\n")
+print(summary(train_hmeq))
+cat("\n")
+
+# Review missingness pattern in training data
+cat("Training data missing pattern for selected credit-history variables:\n")
+na_pattern_tr <- md.pattern(train_hmeq[, c("CLNO", "CLAGE", "NINQ", "DEROG", "DELINQ")],
+                            rotate.names = TRUE)
+print(na_pattern_tr)
+cat("\n")
+
+aggr(train_hmeq, prop = FALSE, numbers = TRUE, sortCombs = TRUE)
+
+# Check class distribution in testing set
+cat("Test data class proportions (%):\n")
+print(round(prop.table(table(test_hmeq$BAD)) * 100, 2))
+cat("\n")
+
+cat("Testing data summary:\n")
+print(summary(test_hmeq))
+cat("\n")
+
+##--------- Missing Data Imputation -------------
+
+
+cat("------------ MISSING DATA IMPUTATION ------------\n")
+
+# Impute missing values using missRanger
+library(missRanger)
+set.seed(2026)
+cat("Running missRanger imputation...\n")
+imp_mR_model <- missRanger(train_hmeq[,-1],formula = . ~ . , keep_forests = TRUE)
+
+# Extract the completed dataset from missRanger
+train_hmeq_mR_imp <- imp_mR_model$data
+cat("missRanger imputation completed.\n\n")
+
+# Round selected discrete variables after missRanger imputation
+discrete_vars <- c("DELINQ", "DEROG", "NINQ", "CLNO", "YOJ")
+train_hmeq_mR_imp[, discrete_vars] <- round(train_hmeq_mR_imp[, discrete_vars], 0)
+
+# Variables to compare across imputation methods
+cont_var <- c("LOAN", "MORTDUE", "VALUE", "YOJ", "CLAGE", "DEBTINC",
+              "DELINQ", "DEROG", "CLNO", "NINQ")
+
+# Compare original and imputed distributions using boxplots
+par(mfrow = c(3, 3), mar = c(4, 4, 2, 1))
+for (v in cont_var) {
+  boxplot(train_hmeq[[v]],
+          train_hmeq_mR_imp[[v]],
+          names = c("Original", "missRanger"),
+          main = paste("Boxplot of", v),
+          col = c("lightgray", "mistyrose"),
+          ylab = v)
+}
+par(mfrow = c(1, 1))
+
+train_hmeq_mR_imp$BAD <- train_hmeq$BAD
+
+# Compare correlation structures across original and imputed dataset
+cor_original <- cor(train_hmeq[, sapply(train_hmeq, is.numeric)], use = "complete.obs")
+cor_mr <- cor(train_hmeq_mR_imp[, sapply(train_hmeq_mR_imp, is.numeric)])
+
+cat("Correlation matrix - Original data:\n")
+print(round(cor_original, 2))
+cat("\n")
+
+cat("Correlation matrix - missRanger imputed data:\n")
+print(round(cor_mr, 2))
+cat("\n")
+
+# Impute Test Data Using Trained missRanger Model
+
+
+cat("------------ TEST DATA IMPUTATION ------------\n")
+
+# Make sure categorical variables in test data have the same type as training data
+test_hmeq$REASON <- as.factor(test_hmeq$REASON)
+test_hmeq$JOB <- as.factor(test_hmeq$JOB)
+
+# Keep factor levels consistent with training data
+test_hmeq$REASON <- factor(test_hmeq$REASON, levels = levels(train_hmeq$REASON))
+test_hmeq$JOB    <- factor(test_hmeq$JOB, levels = levels(train_hmeq$JOB))
+
+# Check the missing values in test data
+cat("Missing values in test data before imputation:\n")
+print(colSums(is.na(test_hmeq)))
+cat("\n")
+
+# Impute the test data using the trained missRanger model
+test_hmeq_mR_imp <- predict(imp_mR_model, test_hmeq)
+
+# Check whether any missing values remain
+cat("Missing values in test data after imputation:\n")
+print(colSums(is.na(test_hmeq_mR_imp)))
+cat("\n")
+
+# Round imputed discrete variables to whole numbers
+discrete_vars <- c("DELINQ", "DEROG", "NINQ", "CLNO", "YOJ")
+test_hmeq_mR_imp[, discrete_vars] <- round(test_hmeq_mR_imp[, discrete_vars], 0)
+
+# Review summary of the imputed test data
+cat("Summary of imputed test data:\n")
+print(summary(test_hmeq_mR_imp))
+cat("\n")
+
+##--------- Create Target variable LTV for Regression ----------
+
+
+cat("------------ LTV CREATION ------------\n")
+
+train_hmeq_mR_imp$LTV <- train_hmeq_mR_imp$LOAN / train_hmeq_mR_imp$VALUE
+
+cat("Summary of LTV in training data:\n")
+print(summary(train_hmeq_mR_imp$LTV))
+cat("\n")
+
+p_ltv <- ggplot(train_hmeq_mR_imp, aes(x = LTV)) +
+  geom_histogram(bins = 40, fill = "lightblue", color = "black") +
+  labs(title = "Distribution of Total Leverage")
+print(p_ltv)
+
+# Correlation with LTV and other numeric predictors
+cor_ltv <- round(cor(train_hmeq_mR_imp[, sapply(train_hmeq_mR_imp, is.numeric)]), 2)[, "LTV"]
+cat("Correlation of LTV with numeric predictors:\n")
+print(cor_ltv)
+cat("\n")
+
+test_hmeq_mR_imp$LTV <- test_hmeq_mR_imp$LOAN / test_hmeq_mR_imp$VALUE
+
+##--------- Scaling and Dummy variables for Clustering ----------------
+
+cat("------------ SCALING AND DUMMY VARIABLES ------------\n")
+
+# Create dummy variables for categorical fields
+train_hmeq_dum <- fastDummies::dummy_cols(
+  train_hmeq_mR_imp,
+  select_columns = c("JOB", "REASON"),
+  remove_first_dummy = TRUE,
+  remove_selected_columns = TRUE
+)
+test_hmeq_dum <- fastDummies::dummy_cols(
+  test_hmeq_mR_imp,
+  select_columns = c("JOB", "REASON"),
+  remove_first_dummy = TRUE,
+  remove_selected_columns = TRUE
+)
+
+# Normalize selected variables to the 0-1 range
+std_model <- preProcess(train_hmeq_dum[, c("LOAN", "MORTDUE", "VALUE", 
+                                           "YOJ", "DEROG", "DELINQ", "CLAGE",
+                                           "NINQ", "CLNO", "DEBTINC")],
+                        method = "range"
+)
+
+# Apply normalization to the training data
+train_hmeq_std <- predict(std_model,
+                          train_hmeq_dum[, c("LOAN", "MORTDUE", "VALUE", 
+                                             "YOJ", "DEROG", "DELINQ", "CLAGE",
+                                             "NINQ", "CLNO", "DEBTINC")])
+
+train_hmeq_prep <- cbind(train_hmeq_std, train_hmeq_dum[,c("JOB_Office", "JOB_Other", "JOB_ProfExe", 
+                                                           "JOB_Sales", "JOB_Self", "REASON_HomeImp",
+                                                           "MISS_CRED_INFO", "LTV", "BAD")])
+cat("Training data after scaling and dummy encoding:\n")
+cat("Dimensions:", nrow(train_hmeq_prep), "rows and", ncol(train_hmeq_prep), "columns\n\n")
+
+# Apply same preprocessing to test data
+test_hmeq_std <- predict(
+  std_model,
+  test_hmeq_dum[, c("LOAN", "MORTDUE", "VALUE", "YOJ",
+                    "DEROG", "DELINQ", "CLAGE", "NINQ", "CLNO",
+                    "DEBTINC")]
+)
+test_hmeq_prep <- cbind(test_hmeq_std, test_hmeq_dum[,c("JOB_Office", "JOB_Other", "JOB_ProfExe", 
+                                                        "JOB_Sales", "JOB_Self", "REASON_HomeImp",
+                                                        "MISS_CRED_INFO", "LTV", "BAD")])
+
+
+cat("Testing data after scaling and dummy encoding:\n")
+cat("Dimensions:", nrow(test_hmeq_prep), "rows and", ncol(test_hmeq_prep), "columns\n\n")
+
+##--------- K-means Clustering Using All Scaled Inputs-------
+
+
+cat("------------ K-MEANS CLUSTERING: ALL INPUTS ------------\n")
+
+cluster_train_hmeq <- train_hmeq_prep
+
+# Fit k-means clustering using all scaled variables including dummy variables
+set.seed(2026)
+hmeq_cluster_model <- kmeans(cluster_train_hmeq, centers = 3, nstart = 25)
+
+cat("Cluster sizes:\n")
+print(hmeq_cluster_model$size)
+cat("\n")
+
+cat("Cluster centers:\n")
+print(hmeq_cluster_model$centers)
+cat("\n")
+
+# Compute and plot silhouette values
+par(old_par)
+library(cluster)
+sil <- silhouette(hmeq_cluster_model$cluster, dist(cluster_train_hmeq))
+plot(sil, main = "Silhouette Plot (k=3)", col = 1:3, border = NA)
+
+# Attach cluster labels back to the imputed training data
+train_hmeq_mR_imp$cluster_all <- hmeq_cluster_model$cluster
+
+# Summarize cluster size, defaults, and missing credit history rate
+cat("Cluster summary (all scaled inputs):\n")
+cluster_summary_all <- train_hmeq_mR_imp %>% 
+  group_by(cluster_all) %>% 
+  summarise(count = n(),
+            default = sum(BAD == 1),
+            current = sum(BAD == 0),
+            default_per = (sum(BAD == 1) / n()) * 100,
+            Miss_cred = (sum(MISS_CRED_INFO == 1) / n()) * 100,
+            .groups = "drop")
+print(cluster_summary_all)
+cat("\n")
+
+# Compute numeric cluster profiles
+cat("Numeric cluster profiles:\n")
+cluster_profile_all <- train_hmeq_mR_imp %>%
+  group_by(cluster_all) %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+print(cluster_profile_all)
+cat("\n")
+
+# Profile clusters by REASON and JOB
+cat("Cluster distribution by REASON:\n")
+print(train_hmeq_mR_imp %>% group_by(cluster_all, REASON) %>% summarise(n = n(), .groups = "drop"))
+cat("\n")
+
+cat("Cluster distribution by JOB:\n")
+print(train_hmeq_mR_imp %>% group_by(cluster_all, JOB) %>% summarise(n = n(), .groups = "drop"))
+cat("\n")
+
+##--------- K-means Clustering Using Numeric Risk Variables Only------------
+
+cat("------------ K-MEANS CLUSTERING: NUMERIC RISK VARIABLES ONLY ------------\n")
+
+cluster_vars <- c("LOAN", "MORTDUE", "VALUE", "YOJ", "DEROG",
+                  "DELINQ", "CLAGE", "NINQ", "CLNO", "DEBTINC")
+
+# Fit k-means clustering using only numeric borrower risk variables
+set.seed(2026)
+hmeq_cluster_model_num <- kmeans(cluster_train_hmeq[, cluster_vars],
+                                 centers = 3, nstart = 25)
+
+cat("Cluster sizes:\n")
+print(hmeq_cluster_model_num$size)
+cat("\n")
+
+cat("Cluster centers:\n")
+print(hmeq_cluster_model_num$centers)
+cat("\n")
+
+# Compute and plot silhouette values for numeric-only clustering
+sil <- silhouette(hmeq_cluster_model_num$cluster,
+                  dist(cluster_train_hmeq[, c("LOAN", "MORTDUE", "VALUE", "YOJ", "DEROG",
+                                              "DELINQ", "CLAGE", "NINQ", "CLNO", "DEBTINC")]))
+plot(sil, main = "Silhouette Plot (k=3)", col = 1:3, border = NA)
+
+# Attach numeric-only cluster labels to the imputed training set
+train_hmeq_mR_imp$cluster_num <- hmeq_cluster_model_num$cluster
+
+# Summarize default risk and missing credit history by cluster
+cat("Cluster summary (numeric-only inputs):\n")
+cluster_summary_num <- train_hmeq_mR_imp %>% 
+  group_by(cluster_num) %>% 
+  summarise(count = n(),
+            default = sum(BAD == 1),
+            current = sum(BAD == 0),
+            default_per = (sum(BAD == 1) / n()) * 100,
+            Miss_cred = (sum(MISS_CRED_INFO == 1) / n()) * 100,
+            .groups = "drop")
+print(cluster_summary_num)
+cat("\n")
+
+# Compute mean profiles for numeric variables by cluster
+cat("Numeric means by cluster:\n")
+cluster_profile_num <- train_hmeq_mR_imp %>%
+  group_by(cluster_num) %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+print(cluster_profile_num)
+cat("\n")
+
+# Profile numeric-only clusters by REASON and JOB
+cat("Numeric-only cluster distribution by REASON:\n")
+print(train_hmeq_mR_imp %>% group_by(cluster_num, REASON) %>% summarise(n = n(), .groups = "drop"))
+cat("\n")
+
+cat("Numeric-only cluster distribution by JOB:\n")
+print(train_hmeq_mR_imp %>% group_by(cluster_num, JOB) %>% summarise(n = n(), .groups = "drop"))
+cat("\n")
+
+# Cluster Visualization
+print(ggplot(train_hmeq_mR_imp, aes(x = DELINQ, y = DEROG, colour = factor(cluster_num))) +
+        geom_point() + labs(title = "DELINQ vs DEROG by Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_num), y = DEBTINC, colour = factor(cluster_num))) +
+        geom_boxplot() + labs(title = "DEBTINC by Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_num), y = VALUE, colour = factor(cluster_num))) +
+        geom_boxplot() + labs(title = "VALUE by Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_num), y = MORTDUE, colour = factor(cluster_num))) +
+        geom_boxplot() + labs(title = "MORTDUE by Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_num), y = LOAN, colour = factor(cluster_num))) +
+        geom_boxplot() + labs(title = "LOAN by Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = LOAN, y = VALUE, colour = factor(cluster_num))) +
+        geom_point() + labs(title = "LOAN vs VALUE by Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = MORTDUE, y = VALUE, colour = factor(cluster_num))) +
+        geom_point() + labs(title = "MORTDUE vs VALUE by Cluster"))
+
+# Selecting the Number of Clusters
+library(factoextra)
+
+cat("Comparing average silhouette width for different k values...\n")
+set.seed(2026)
+fviz_nbclust(cluster_train_hmeq[, c("LOAN", "MORTDUE", "VALUE", "YOJ", "DEROG",
+                                    "DELINQ", "CLAGE", "NINQ", "CLNO", "DEBTINC")],
+             kmeans,
+             method = "silhouette",
+             k.max = 8)
+
+##--------- Final Two-Cluster Solution-----------
+
+cat("------------ FINAL TWO-CLUSTER SOLUTION ------------\n")
+
+cluster_vars <- c("LOAN", "MORTDUE", "VALUE", "YOJ", "DEROG",
+                  "DELINQ", "CLAGE", "NINQ", "CLNO", "DEBTINC")
+
+# Fit final k-means model with k = 2 based on silhouette results
+set.seed(2026)
+hmeq_cluster_model_2 <- kmeans(cluster_train_hmeq[, cluster_vars],
+                               centers = 2, nstart = 25)
+
+cat("Final k=2 clustering completed.\n")
+cat("Cluster sizes:\n")
+print(hmeq_cluster_model_2$size)
+cat("\n")
+
+cat("Cluster centers:\n")
+print(hmeq_cluster_model_2$centers)
+cat("\n")
+
+# Compute and visualize silhouette plot for k = 2
+sil_2 <- silhouette(hmeq_cluster_model_2$cluster,
+                    dist(cluster_train_hmeq[, c("LOAN", "MORTDUE", "VALUE", "YOJ", "DEROG",
+                                                "DELINQ", "CLAGE", "NINQ", "CLNO", "DEBTINC")]))
+plot(sil_2, main = "Silhouette Plot (k=2)", col = 1:2, border = NA)
+
+# Save final cluster labels
+train_hmeq_mR_imp$cluster_final <- hmeq_cluster_model_2$cluster
+
+# Summarize final cluster characteristics
+cat("Final cluster summary:\n")
+final_cluster_summary <- train_hmeq_mR_imp %>% 
+  group_by(cluster_final) %>% 
+  summarise(count = n(),
+            default = sum(BAD == 1),
+            current = sum(BAD == 0),
+            default_per = (sum(BAD == 1) / n()) * 100,
+            Miss_cred = (sum(MISS_CRED_INFO == 1) / n()) * 100,
+            .groups = "drop")
+print(final_cluster_summary)
+cat("\n")
+
+# Compute average numeric values for the final clusters
+cat("Average numeric values for final clusters:\n")
+final_cluster_profile <- train_hmeq_mR_imp %>%
+  group_by(cluster_final) %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+print(final_cluster_profile)
+cat("\n")
+
+# Profile final clusters by REASON and JOB
+cat("Final cluster distribution by REASON:\n")
+print(train_hmeq_mR_imp %>% group_by(cluster_final, REASON) %>% summarise(n = n(), .groups = "drop"))
+cat("\n")
+
+cat("Final cluster distribution by JOB:\n")
+print(train_hmeq_mR_imp %>% group_by(cluster_final, JOB) %>% summarise(n = n(), .groups = "drop"))
+cat("\n")
+
+###-------- Visualizing the Final Two Clusters----------
+
+print(ggplot(train_hmeq_mR_imp, aes(x = DELINQ, y = DEROG, colour = factor(cluster_final))) +
+        geom_point() + labs(title = "DELINQ vs DEROG by Final Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_final), y = DEBTINC, colour = factor(cluster_final))) +
+        geom_boxplot() + labs(title = "DEBTINC by Final Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_final), y = VALUE, colour = factor(cluster_final))) +
+        geom_boxplot() + labs(title = "VALUE by Final Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_final), y = MORTDUE, colour = factor(cluster_final))) +
+        geom_boxplot() + labs(title = "MORTDUE by Final Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = factor(cluster_final), y = LOAN, colour = factor(cluster_final))) +
+        geom_boxplot() + labs(title = "LOAN by Final Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = LOAN, y = VALUE, colour = factor(cluster_final))) +
+        geom_point() + labs(title = "LOAN vs VALUE by Final Cluster"))
+
+print(ggplot(train_hmeq_mR_imp, aes(x = MORTDUE, y = VALUE, colour = factor(cluster_final))) +
+        geom_point() + labs(title = "MORTDUE vs VALUE by Final Cluster"))
+##--------- Regression Analysis: Predict LTV ----------------
+
+
+cat("------------ REGRESSION Analysis: PREDICT LTV ------------\n")
+
+# Candidate predictors
+reg_vars <- c("MORTDUE", "YOJ", "DEROG", "DELINQ", "CLAGE",
+              "NINQ", "CLNO", "DEBTINC", "MISS_CRED_INFO", 
+              "JOB_Office", "JOB_Other", "JOB_ProfExe", 
+              "JOB_Sales", "JOB_Self", "REASON_HomeImp")
+
+regr_train_hmeq <- cbind(train_hmeq_prep[, reg_vars],LTV=train_hmeq_mR_imp$LTV)
+regr_test_hmeq <- cbind(test_hmeq_prep[,reg_vars], LTV=test_hmeq_mR_imp$LTV)
+# Full model on unscaled data to check the variable importance
+full_model <- lm(LTV ~ ., data = regr_train_hmeq)
+
+cat("Summary of full regression model:\n")
+print(summary(full_model))
+cat("\n")
+
+library(car)
+
+cat("VIF values for full regression model:\n")
+print(vif(full_model))
+cat("\n")
+
+step_model <- step(lm(LTV ~ ., data = regr_train_hmeq), direction = "both")
+
+cat("Summary of stepwise regression model:\n")
+print(summary(step_model))
+cat("\n")
+
+pred_step <- predict(step_model, regr_test_hmeq)
+perf_metrics_step <- forecast::accuracy(pred_step, regr_test_hmeq$LTV)
+
+cat("Stepwise regression performance metrics:\n")
+print(perf_metrics_step)
+cat("\n")
+
+cat("Correlation between predicted and actual LTV (stepwise model):\n")
+print(cor(pred_step, regr_test_hmeq$LTV))
+cat("\n")
+
+###-------- Model Improvement----------------
+
+cat("------------ REGRESSION MODEL IMPROVEMENT ------------\n")
+
+regr_train_hmeq$log_MORTDUE <- log(train_hmeq_mR_imp$MORTDUE + 1)
+regr_test_hmeq$log_MORTDUE <- log(test_hmeq_mR_imp$MORTDUE + 1)
+
+improved_model <- lm(
+  LTV ~ log_MORTDUE + DEROG + DELINQ +
+    CLAGE + NINQ + CLNO + REASON_HomeImp +
+    JOB_Other + JOB_Self + MISS_CRED_INFO,
+  data = regr_train_hmeq
+)
+
+cat("Summary of improved regression model:\n")
+print(summary(improved_model))
+cat("\n")
+
+plot(improved_model, ask = FALSE)
+
+pred <- predict(improved_model, regr_test_hmeq)
+
+res_df <- data.frame(
+  Actuals = regr_test_hmeq$LTV,
+  Predictions = round(pred, 2),
+  Error = round(regr_test_hmeq$LTV - pred, 2)
+)
+
+cat("First few actual vs predicted LTV values:\n")
+print(head(res_df))
+cat("\n")
+
+print(ggplot(res_df, aes(Error)) +
+        geom_histogram(aes(y = after_stat(density))) +
+        geom_density() +
+        labs(title = "Prediction Error Distribution"))
+
+# Also check for remaining influential observations
+car::influencePlot(improved_model)
+
+# Check for negative predictions
+cat("Negative predictions:", sum(pred < 0), "\n")
+cat("Predictions above 2:", sum(pred > 2), "\n\n")
+
+res_df$Predictions[res_df$Predictions < 0] <- 0
+
+perf_metrics <- forecast::accuracy(res_df$Predictions, res_df$Actuals)
+cat("Improved regression model performance metrics:\n")
+print(perf_metrics)
+cat("\n")
+
+cat("Correlation between actual and adjusted predictions:\n")
+print(cor(res_df$Actuals, res_df$Predictions))
+cat("\n")
+
+###-------- Regression Tree-----------
+cat("\n-------- Regression Tree-----------\n")
+library(rpart)
+reg_vars <- c("LTV", "MORTDUE", "YOJ", "DEROG", "DELINQ", "CLAGE",
+              "NINQ", "CLNO", "DEBTINC", "REASON", "JOB", "MISS_CRED_INFO")
+set.seed(2026)
+regr_tree_hmeq <- rpart(LTV ~ . , data = train_hmeq_mR_imp[,reg_vars], method = "anova")
+print(regr_tree_hmeq)
+
+# Plot tree
+rattle::fancyRpartPlot(regr_tree_hmeq)
+
+# Print and plot Cp values 
+cat("\nCp Table:\n")
+printcp(regr_tree_hmeq)
+plotcp(regr_tree_hmeq)
+
+# Evaluation using test set
+pred_regr_hmeq <- predict(regr_tree_hmeq, test_hmeq_mR_imp[,reg_vars])
+
+cat("\nRegression Tree Performance Metrics:\n")
+print(forecast::accuracy(pred_regr_hmeq, test_hmeq_mR_imp$LTV))
+
+cat("\nCorrelation between test pred and actuals\n:")
+print(cor(pred_regr_hmeq, test_hmeq_mR_imp$LTV))
+
+cat("\nCorrelation between train pred and actuals\n:")
+print(cor(predict(regr_tree_hmeq, train_hmeq_mR_imp[,reg_vars]), train_hmeq_mR_imp$LTV))
+
+cat("\n-------- Pruning Regression Tree-----------\n")
+library(rpart)
+reg_vars <- c("LTV", "MORTDUE", "YOJ", "DEROG", "DELINQ", "CLAGE",
+              "NINQ", "CLNO", "DEBTINC", "REASON", "JOB", "MISS_CRED_INFO")
+set.seed(2026)
+regr_pruned_tree_hmeq <- rpart(LTV ~ . , 
+                               data = train_hmeq_mR_imp[,reg_vars], 
+                               method = "anova", 
+                               control = c(cp=0.012, cval = 20))
+print(regr_pruned_tree_hmeq)
+
+# Plot tree
+rattle::fancyRpartPlot(regr_pruned_tree_hmeq)
+
+# Print and plot Cp values 
+cat("\nCp Table:\n")
+printcp(regr_pruned_tree_hmeq)
+plotcp(regr_pruned_tree_hmeq)
+
+# Evaluation using test set
+pred_regr_hmeq <- predict(regr_pruned_tree_hmeq, test_hmeq_mR_imp[,reg_vars])
+
+cat("\nRegression Tree Performance Metrics:\n")
+print(forecast::accuracy(pred_regr_hmeq, test_hmeq_mR_imp$LTV))
+
+cat("\nCorrelation between test pred and actuals\n:")
+print(cor(pred_regr_hmeq, test_hmeq_mR_imp$LTV))
+
+cat("\nCorrelation between train pred and actuals\n:")
+print(cor(predict(regr_pruned_tree_hmeq, train_hmeq_mR_imp[,reg_vars]), train_hmeq_mR_imp$LTV))
+
+##--------- Class Balancing for Classification-----------
+cat("\n------------ CLASS BALANCING FOR CLASSIFICATION ------------\n")
+
+library(ROSE)
+class_vars <- c("MORTDUE", "REASON", "JOB",
+                "YOJ", "DEROG", "DELINQ", "CLAGE", "NINQ", "LTV",
+                "CLNO", "DEBTINC", "MISS_CRED_INFO", "BAD")
+
+class_train_hmeq <- train_hmeq_mR_imp[,class_vars]
+class_test_hmeq <- test_hmeq_mR_imp[,class_vars]
+
+# Convert BAD to factor before resampling
+train_hmeq_mR_imp$BAD <- as.factor(train_hmeq_mR_imp$BAD)
+
+
+# Apply oversampling to improve class balance
+set.seed(2026)
+class_train_hmeq_bal <- ovun.sample(BAD ~ .,
+                                    data = class_train_hmeq,
+                                    method = "over",
+                                    N = nrow(class_train_hmeq) * 1.5)$data
+
+# Check class distribution after balancing
+cat("Class distribution after oversampling:\n")
+print(table(class_train_hmeq_bal$BAD))
+cat("\n")
+
+cat("Class proportions after oversampling (%):\n")
+print(round(prop.table(table(class_train_hmeq_bal$BAD)) * 100, 1))
+cat("\n")
+
+# Plot class distribution after balancing
+print(ggplot(class_train_hmeq_bal, aes(factor(BAD))) + 
+        geom_bar() +
+        labs(title = "Class Distribution After Oversampling", x = "BAD", y = "Count"))
+
+# Compare summaries of default class before and after balancinga
+cat("Summary of BAD=1 in balanced dataset:\n")
+print(summary(class_train_hmeq_bal[class_train_hmeq_bal$BAD == 1, ]))
+cat("\n")
+
+cat("Summary of BAD=1 in original imputed training dataset:\n")
+print(summary(train_hmeq_mR_imp[train_hmeq_mR_imp$BAD == 1, ]))
+cat("\n")
+
+# Convert BAD back to numeric for correlation analysis
+class_train_hmeq$BAD <- as.numeric(as.character(class_train_hmeq$BAD))
+class_train_hmeq_bal$BAD <- as.numeric(as.character(class_train_hmeq_bal$BAD))
+# Correlation matrix of the balanced training set
+cor_bal <- round(cor(class_train_hmeq_bal[, sapply(class_train_hmeq_bal, is.numeric)]), 2)
+cat("Correlation matrix of balanced training set:\n")
+print(cor_bal)
+cat("\n")
+
+# Compare correlation differences between imputed and balanced datasets
+cat("Difference in correlations: balanced - original imputed:\n")
+print(round(cor(class_train_hmeq[, sapply(class_train_hmeq, is.numeric)]), 2) - cor_bal )
+cat("\n")
+
+##--------- Classification : Classify BAD-----------
+
+cat("------------ CLASSIFICATION STAGE: CLASSIFY BAD ------------\n")
+
+# Convert target to factor for classification
+class_train_hmeq_bal$BAD <- as.factor(class_train_hmeq_bal$BAD)
+class_test_hmeq$BAD <- as.factor(class_test_hmeq$BAD)
+
+###-------- Logistic Regression Model-------------------
+
+cat("------------ LOGISTIC REGRESSION MODEL ------------\n")
+
+class_glm_model <- glm(
+  BAD ~ .,
+  data = class_train_hmeq_bal,
+  family = binomial
+)
+
+cat("Summary of logistic regression model:\n")
+print(summary(class_glm_model))
+cat("\n")
+
+# Predicted probabilities of default
+class_test_hmeq$prob_logit <- predict(
+  class_glm_model,
+  newdata = class_test_hmeq,
+  type = "response"
+)
+
+cat("Summary of predicted probabilities:\n")
+print(summary(class_test_hmeq$prob_logit))
+cat("\n")
+
+# Classification at 0.50 cutoff
+class_test_hmeq$pred_BAD <- ifelse(class_test_hmeq$prob_logit >= 0.50, 1, 0)
+class_test_hmeq$pred_BAD <- as.factor(class_test_hmeq$pred_BAD)
+
+# Confusion matrix
+cat("Confusion matrix for logistic regression at 0.50 cutoff:\n")
+print(confusionMatrix(class_test_hmeq$pred_BAD, class_test_hmeq$BAD, positive = "1"))
+cat("\n")
+
+library(pROC)
+
+roc_obj <- roc(
+  response = class_test_hmeq$BAD,
+  predictor = class_test_hmeq$prob_logit
+)
+
+plot(roc_obj, main = "ROC Curve - Logistic Regression")
+
+cat("AUC for logistic regression:\n")
+print(auc(roc_obj))
+cat("\n")
+
+# Approved = predicted BAD = 0
+approval_rate <- mean(class_test_hmeq$pred_BAD == 0) * 100
+
+# Actual default rate among approved borrowers
+default_rate_approved <- mean(
+  as.numeric(as.character(class_test_hmeq$BAD[class_test_hmeq$pred_BAD == 0]))
+) * 100
+
+cat("Approval Rate (%):", round(approval_rate, 2), "\n")
+cat("Default Rate Among Approved Borrowers (%):", round(default_rate_approved, 2), "\n\n")
+
+cutoff_results <- data.frame()
+
+for (cut in seq(0.30, 0.70, by = 0.05)) {
+  
+  pred_class <- ifelse(class_test_hmeq$prob_logit >= cut, 1, 0)
+  
+  approval_rate <- mean(pred_class == 0) * 100
+  
+  approved_idx <- pred_class == 0
+  
+  default_rate_approved <- mean(
+    as.numeric(as.character(class_test_hmeq$BAD[approved_idx]))
+  ) * 100
+  
+  cutoff_results <- rbind(
+    cutoff_results,
+    data.frame(
+      cutoff = cut,
+      approval_rate = approval_rate,
+      default_rate_approved = default_rate_approved
+    )
+  )
+}
+
+cat("Cutoff comparison table:\n")
+print(cutoff_results)
+cat("\n")
+
+###-------- Decision Tree Model-------------------
+
+cat("------------ DECISION TREE MODEL ------------\n")
+
+library(rpart)
+library(rpart.plot)
+
+set.seed(2026)
+
+class_tree_model <- rpart(
+  BAD ~ .,
+  data = class_train_hmeq_bal,
+  method = "class"
+)
+
+cat("Decision tree model structure:\n")
+print(class_tree_model)
+cat("\n")
+
+cat("CP table of decision tree:\n")
+printcp(class_tree_model)
+cat("\n")
+
+plotcp(class_tree_model)
+
+# Plot the Tree
+rattle::fancyRpartPlot(class_tree_model, main = "Decision Tree Plot")
+
+###-------- Pruning the Tree--------------
+
+cat("------------ PRUNING THE DECISION TREE ------------\n")
+
+
+
+# Prune the tree
+pruned_tree <- prune(class_tree_model, cp = 0.011451,)
+print(pruned_tree)
+
+# Plot the pruned tree
+rattle::fancyRpartPlot(pruned_tree, main = "Pruned Decision Tree Plot")
+
+prob_tree <- predict(
+  pruned_tree,
+  newdata = class_test_hmeq,
+  type = "prob"
+)
+
+class_test_hmeq$prob_tree <- prob_tree[, 2]
+
+class_test_hmeq$tree_pred <- ifelse(
+  class_test_hmeq$prob_tree >= 0.60,
+  1,
+  0
+)
+
+class_test_hmeq$tree_pred <- as.factor(class_test_hmeq$tree_pred)
+
+cat("Confusion matrix for pruned tree at 0.60 cutoff:\n")
+print(confusionMatrix(
+  class_test_hmeq$tree_pred,
+  class_test_hmeq$BAD,
+  positive = "1"
+))
+cat("\n")
+
+tree_roc <- roc(
+  class_test_hmeq$BAD,
+  class_test_hmeq$prob_tree
+)
+
+plot(tree_roc, main = "ROC Curve - Decision Tree")
+
+cat("AUC for decision tree:\n")
+print(auc(tree_roc))
+cat("\n")
+
+approval_rate_tree <- mean(class_test_hmeq$tree_pred == 0) * 100
+
+default_rate_tree <- mean(
+  as.numeric(as.character(
+    class_test_hmeq$BAD[class_test_hmeq$tree_pred == 0]
+  ))
+) * 100
+
+cat("Decision Tree Approval Rate (%):", round(approval_rate_tree, 2), "\n")
+cat("Decision Tree Default Rate Among Approved Borrowers (%):", round(default_rate_tree, 2), "\n\n")
+
+###-------- c50 Model-------------------
+
+cat("------------ c50 MODEL ------------\n")
+tree_c50_model <- C50::C5.0(class_train_hmeq_bal[,c("MORTDUE", "YOJ", "DEROG", "LTV", "DELINQ","CLAGE",
+                                                    "NINQ", "CLNO", "DEBTINC", "REASON", "JOB","MISS_CRED_INFO")],
+                            class_train_hmeq_bal$BAD, rules = TRUE)
+tree_c50_model
+
+summary(tree_c50_model)
+
+
+prob_c50 <- predict(
+  tree_c50_model,
+  newdata = class_test_hmeq,
+  type = "prob"
+)
+
+class_test_hmeq$prob_c50 <- prob_c50[, 2]
+
+
+tree_pred_c50 <- ifelse(
+  prob_c50[,2] > 0.60,
+  1,
+  0
+)
+
+tree_pred_c50 <- as.factor(tree_pred_c50)
+
+cat("Confusion matrix for pruned tree at 0.60 cutoff:\n")
+print(confusionMatrix(
+  tree_pred_c50,
+  factor(class_test_hmeq$BAD),
+  positive = "1"
+))
+cat("\n")
+
+c50_roc <- roc(
+  class_test_hmeq$BAD,
+  prob_c50[,2]
+)
+
+cat("AUC for c50 model:\n")
+print(auc(c50_roc))
+cat("\n")
+
+# Create empty data frame
+model_cutoff_results <- data.frame()
+
+# Loop through cutoff values
+for (cut in seq(0.30, 0.70, by = 0.05)) {
+  
+  # Logistic Regression predictions
+  glm_pred <- ifelse(class_test_hmeq$prob_logit >= cut, 1, 0)
+  glm_approved <- glm_pred == 0
+  
+  glm_approval_rate <- mean(glm_approved) * 100
+  glm_default_rate_approved <- mean(
+    as.numeric(as.character(class_test_hmeq$BAD[glm_approved]))
+  ) * 100
+  
+  # Decision Tree predictions
+  tree_pred <- ifelse(class_test_hmeq$prob_tree >= cut, 1, 0)
+  tree_approved <- tree_pred == 0
+  
+  tree_approval_rate <- mean(tree_approved) * 100
+  tree_default_rate_approved <- mean(
+    as.numeric(as.character(class_test_hmeq$BAD[tree_approved]))
+  ) * 100
+  
+  # C5.0 predictions
+  c50_pred <- ifelse(class_test_hmeq$prob_c50 >= cut, 1, 0)
+  c50_approved <- c50_pred == 0
+  
+  c50_approval_rate <- mean(c50_approved) * 100
+  c50_default_rate_approved <- mean(
+    as.numeric(as.character(class_test_hmeq$BAD[c50_approved]))
+  ) * 100
+  
+  # Add results to data frame
+  model_cutoff_results <- rbind(
+    model_cutoff_results,
+    data.frame(
+      cutoff = cut,
+      
+      glm_approval_rate = glm_approval_rate,
+      glm_default_rate_approved = glm_default_rate_approved,
+      
+      tree_approval_rate = tree_approval_rate,
+      tree_default_rate_approved = tree_default_rate_approved,
+      
+      c50_approval_rate = c50_approval_rate,
+      c50_default_rate_approved = c50_default_rate_approved
+    )
+  )
+}
+
+# Round results for cleaner output
+model_cutoff_results[, -1] <- round(model_cutoff_results[, -1], 2)
+
+cat("Model cutoff comparison table:\n")
+print(model_cutoff_results)
+
+
