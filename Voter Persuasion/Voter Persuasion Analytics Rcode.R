@@ -1,15 +1,46 @@
-#Load libraries
-library(dplyr)
-library(caret)
-library(ggplot2)
+#============ INSTALL & LOAD REQUIRED PACKAGES=======
+required_packages <- c(
+  "lubridate",
+  "dplyr",
+  "ggplot2",
+  "caret",
+  "rpart",
+  "rattle",
+  "corrplot",
+  "scales",
+  "ROCR",
+  "pROC",
+  "rpart.plot",
+  "tidyr"
+)
+
+# Install missing packages only
+new_packages <- required_packages[!(required_packages %in% installed.packages()[, "Package"])]
+
+if(length(new_packages)) {
+  install.packages(new_packages)
+}
+
+# Load all packages
+lapply(required_packages, library, character.only = TRUE)
+
+
+# Avoid scientific notation in printed output
+options(scipen = 999)
+
+# Save current plotting settings
+old_par <- par(no.readonly = TRUE) 
 
 set.seed(2026)
+#============ VOTER PERSUASION ANALYSIS=====================
+cat("\n============VOTER PERSUASION ANALYSIs=====================\n")
 #Load the data set
 vp_data <- read.csv("./VoterPersuasion.csv")
 
-#---------------------------
-# Data Quality and Structure
-#---------------------------
+
+
+##--------- Data Quality and Structure-------------
+
 cat("\n---------------------------\n")
 cat("\nData Quality and Structure\n")
 cat("\n---------------------------\n")
@@ -29,9 +60,8 @@ print(colSums(is.na(vp_data)))
 cat("\n Number of unique voter IDs\n")
 print(length(unique(vp_data$VOTER_ID)))
 
-#---------------------------
-# Exploratory Data Analysis
-#---------------------------
+##--------- Exploratory Data Analysis ---------------
+
 cat("\n---------------------------\n")
 cat("\nExploratory Data Analysis\n")
 cat("\n---------------------------\n")
@@ -62,11 +92,20 @@ vp_data$party <- ifelse(vp_data$PARTY_D == 1, "Democrat",
 print(table(vp_data$party))
 
 cat("\n Party Affiliation and the persuaion percentage\n")
-print(vp_data %>% group_by(party) %>% 
-        summarise(persuaded = sum(MOVED_A),
-                  message_received = sum(MESSAGE_A),
-                  count = n()) %>% 
-        mutate(party_per = count/sum(count)*100,persuaded_per = (persuaded/count)*100))
+print(vp_data %>% 
+        group_by(party) %>% 
+        summarise(
+          count = n(),
+          message_received = sum(MESSAGE_A),
+          persuaded = sum(MOVED_A),
+          persuaded_mes_rec = sum(MOVED_A == 1 & MESSAGE_A == 1)
+        ) %>% 
+        mutate(
+          Mes_rec_per = message_received / count * 100,
+          party_per = count / sum(count) * 100,
+          persuaded_per = persuaded / count * 100,
+          persuaded_mesrec_per = persuaded_mes_rec / message_received * 100
+        ))
 
 
 # Understanding the Gender Distribution
@@ -75,23 +114,40 @@ print(table(vp_data$GENDER))
 
 # Understanding the candidate support and persuasion effect by treatment
 cat("\n Candidate 1 support, persuasion and treatment\n")
-print(vp_data %>% group_by(CAND1S) %>% 
-        summarise(persuaded = sum(MOVED_A),
-                  message_received = sum(MESSAGE_A),
-                  count = n()) %>% 
-        mutate(persuaded_per = (persuaded/count)*100))
+print(vp_data %>% 
+        group_by(CAND1S) %>% 
+        summarise(
+          count = n(),
+          message_received = sum(MESSAGE_A),
+          persuaded = sum(MOVED_A),
+          persuaded_mes_rec = sum(MOVED_A == 1 & MESSAGE_A == 1)
+        ) %>% 
+        mutate(
+          Mes_rec_per = message_received / count * 100,
+          party_per = count / sum(count) * 100,
+          persuaded_per = persuaded / count * 100,
+          persuaded_mesrec_per = persuaded_mes_rec / message_received * 100
+        ))
 
 cat("\n Candidate 2 support, persuasion and treatment\n")
-print(vp_data %>% group_by(CAND2S) %>% 
-        summarise(persuaded = sum(MOVED_A),
-                  message_received = sum(MESSAGE_A),
-                  count = n()) %>% 
-        mutate(persuaded_per = (persuaded/count)*100))
+print(vp_data %>% 
+        group_by(CAND2S) %>% 
+        summarise(
+          count = n(),
+          message_received = sum(MESSAGE_A),
+          persuaded = sum(MOVED_A),
+          persuaded_mes_rec = sum(MOVED_A == 1 & MESSAGE_A == 1)
+        ) %>% 
+        mutate(
+          Mes_rec_per = message_received / count * 100,
+          party_per = count / sum(count) * 100,
+          persuaded_per = persuaded / count * 100,
+          persuaded_mesrec_per = persuaded_mes_rec / message_received * 100
+        ))
 
 
-#---------------------
-# Data Visualizations
-#---------------------
+##--------- Data Visualizations --------------
+
 cat("\n---------------------------\n")
 cat("\nData Visualizations\n")
 cat("\n---------------------------\n")
@@ -128,17 +184,16 @@ print(party_plot)
 
 # Correlation Analysis
 cor_data <- vp_data %>%
-  select_if(is.numeric) %>% cor()
+  select_if(is.numeric) %>% cor() %>% round(2)
 
 select_cor <- vp_data %>%select(MOVED_A, MESSAGE_A, PARTY_D, PARTY_R, PARTY_I, AGE, 
                                 GENDER_F, GENDER_M, MED_HH_INC, HH_ND, HH_NR, HH_NI,
                                 VG_04, VG_06, VG_08, VG_10, VG_12,POLITICALC,NL5G,NL3PR,NL5AP) %>% cor()
-corrplot::corrplot(select_cor)
+corrplot::corrplot.mixed(select_cor,tl.pos = 'lt')
 
 
-#------------------------------
-# Preparing Data for modeling
-#------------------------------
+##--------- Preparing Data for modeling----------
+
 cat("\n---------------------------\n")
 cat("\nPreparing Data for modeling\n")
 cat("\n---------------------------\n")
@@ -160,14 +215,13 @@ factor_cols <- c('MOVED_A','MESSAGE_A',
 
 modeling_Voterdata[factor_cols] <- lapply(modeling_Voterdata[factor_cols],as.factor)
 
-#------------------------------
-# Model Fitting and Evaluation
-#------------------------------
+##--------- Model Fitting and Evaluation-----------
+
 cat("\n---------------------------\n")
 cat("\nModel Fitting and Evaluation\n")
 cat("\n---------------------------\n")
 
-#--------- Logistic Regression Model-----------
+###-------- Logistic Regression Model-----------
 
 cat("\n--------- Logistic Regression Model-----------\n")
 
@@ -265,8 +319,8 @@ print(summary(model_glm_intr))
 # Make predictions on the test set
 # Get probabilities (between 0 and 1)
 logistic_probabilities_intr <- predict(model_glm_intr, 
-                                  newdata = test_voterdata_std, 
-                                  type = "response")
+                                       newdata = test_voterdata_std, 
+                                       type = "response")
 
 # Convert probabilities to Yes/No predictions, If probability > 0.5, predict Yes, otherwise No
 logistic_predictions_intr <- ifelse(logistic_probabilities_intr > 0.5, "1", "0")
@@ -276,8 +330,8 @@ cat("Model Evaluation")
 
 # Evaluate the model using a confusion matrix
 logistic_cm_intr <- confusionMatrix(logistic_predictions_intr, 
-                               test_voterdata_std$MOVED_A, 
-                               positive = "1")
+                                    test_voterdata_std$MOVED_A, 
+                                    positive = "1")
 cat("\nLogistic Regression w. Interacton Terms - Confusion Matrix:\n")
 print(logistic_cm_intr)
 
@@ -290,7 +344,7 @@ logistic_auc_intr <- auc(roc_score_intr)
 
 cat("\nLogistic Regression w. InteractionsAUC:", round(logistic_auc_intr, 4), "\n")
 
-# -----------Decision Tree Model--------------
+### ------- Decision Tree Model--------------
 cat("\n-----------Decision Tree Model--------------\n")
 library(rpart)
 library(rpart.plot)
@@ -357,9 +411,8 @@ cat("\nRules of the tree which can be used in Campaign outreach planning:\n")
 print(rpart.rules(model_ctrl_dt))
 
 
-#------------------------------
-# Model Comparison
-#------------------------------
+##--------- Model Comparison-------------
+
 comparison <- data.frame(
   Model = c("Logistic Regression",
             "Logistic Regression (Interaction)",
