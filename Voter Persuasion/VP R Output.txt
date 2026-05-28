@@ -1,0 +1,633 @@
+============VOTER PERSUASION ANALYSIs=====================
+
+---------------------------
+
+Data Quality and Structure
+
+---------------------------
+
+ Structure of the dataset
+'data.frame':	10000 obs. of  79 variables:
+ $ X            : int  1 2 3 4 5 6 7 8 9 10 ...
+ $ VOTER_ID     : int  193801 627701 306924 547609 141105 334787 431906 618337 84502 316168 ...
+ $ SET_NO       : int  2 1 2 1 3 1 1 3 3 3 ...
+ $ OPP_SEX      : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ AGE          : int  28 53 68 66 23 49 59 37 23 62 ...
+ $ HH_ND        : int  1 2 2 0 0 2 2 0 1 1 ...
+ $ HH_NR        : int  1 0 1 2 3 0 0 1 2 0 ...
+ $ HH_NI        : int  1 0 0 0 1 0 0 1 3 1 ...
+ $ MED_AGE      : int  37 46 41 35 42 32 50 53 32 37 ...
+ $ NH_WHITE     : int  61 87 23 53 74 64 82 97 67 54 ...
+ $ NH_AA        : int  34 8 64 29 18 30 0 2 12 37 ...
+ $ NH_ASIAN     : int  0 0 7 4 0 4 0 0 14 1 ...
+ $ NH_MULT      : int  0 0 2 0 0 0 1 0 2 7 ...
+ $ HISP         : int  4 5 3 3 8 2 17 1 5 2 ...
+ $ COMM_LT10    : int  26 10 5 27 6 4 7 16 9 21 ...
+ $ COMM_609P    : int  2 1 7 4 12 8 2 0 5 5 ...
+ $ MED_HH_INC   : int  59954 56196 58950 54809 75063 81506 75577 94196 125154 50446 ...
+ $ COMM_CAR     : int  79 74 76 71 92 87 87 90 76 92 ...
+ $ COMM_CP      : int  21 22 5 2 4 6 11 8 11 1 ...
+ $ COMM_PT      : int  0 1 11 2 2 4 0 0 3 0 ...
+ $ COMM_WALK    : int  0 1 3 6 0 0 0 0 4 2 ...
+ $ KIDS         : int  7 16 25 30 24 20 20 14 19 20 ...
+ $ M_MAR        : int  20 61 50 35 50 54 63 45 43 44 ...
+ $ F_MAR        : int  64 54 54 62 50 46 72 42 43 38 ...
+ $ ED_4COL      : int  11 14 15 39 19 33 12 31 34 15 ...
+ $ GENDER_F     : int  1 0 1 0 0 1 0 1 0 0 ...
+ $ GENDER_M     : int  0 1 0 1 1 0 1 0 1 1 ...
+ $ H_AFDLN3P    : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ H_F1         : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ H_M1         : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ H_MFDLN3P    : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ PARTY_D      : int  1 1 0 0 0 1 1 0 0 0 ...
+ $ PARTY_I      : int  0 0 0 0 0 0 0 0 1 1 ...
+ $ PARTY_R      : int  0 0 1 1 1 0 0 1 0 0 ...
+ $ VPP_08       : int  0 0 0 0 0 1 0 1 0 0 ...
+ $ VPP_12       : int  0 0 0 0 0 0 0 1 0 0 ...
+ $ VPR_08       : int  0 0 0 0 0 1 0 0 0 1 ...
+ $ VPR_10       : int  0 0 1 0 0 0 0 0 0 0 ...
+ $ VPR_12       : int  0 0 0 0 0 1 0 0 0 0 ...
+ $ VG_04        : int  0 0 1 1 0 1 0 1 0 1 ...
+ $ VG_06        : int  0 0 1 1 0 1 0 1 0 1 ...
+ $ VG_08        : int  1 0 1 1 0 1 0 1 0 1 ...
+ $ VG_10        : int  0 0 1 1 0 1 0 1 0 1 ...
+ $ VG_12        : int  1 0 0 1 1 1 0 1 0 1 ...
+ $ PP_PELIG     : int  0 0 0 0 0 50 0 100 0 0 ...
+ $ PR_PELIG     : int  0 0 33 0 0 67 0 0 0 33 ...
+ $ AP_PELIG     : int  0 0 20 0 0 60 0 40 0 20 ...
+ $ G_PELIG      : int  40 0 80 100 100 100 0 100 0 100 ...
+ $ E_PELIG      : int  20 0 50 50 50 80 0 70 0 60 ...
+ $ NL5G         : int  2 0 4 5 1 5 0 5 0 5 ...
+ $ NL3PR        : int  0 0 1 0 0 2 0 0 0 1 ...
+ $ NL5AP        : int  0 0 1 0 0 3 0 2 0 1 ...
+ $ NL2PP        : int  0 0 0 0 0 1 0 2 0 0 ...
+ $ REG_DAYS     : int  3997 258 4217 3434 1215 10899 242 4136 300 10879 ...
+ $ UPSCALEBUY   : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ UPSCALEMAL   : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ UPSCALEFEM   : int  1 0 0 0 0 0 0 1 1 0 ...
+ $ BOOKBUYERI   : int  6 1 1 1 1 2 1 2 2 2 ...
+ $ FAMILYMAGA   : int  1 0 1 0 0 1 0 1 1 1 ...
+ $ FEMALEORIE   : int  1 0 0 0 0 0 0 0 0 0 ...
+ $ RELIGIOUSM   : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ GARDENINGM   : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ CULINARYIN   : int  1 0 0 0 0 0 0 0 0 0 ...
+ $ HEALTHFITN   : int  7 1 1 1 1 1 1 1 1 1 ...
+ $ DOITYOURSE   : int  2 0 0 0 0 0 0 0 0 0 ...
+ $ FINANCIALM   : int  1 0 0 0 0 0 0 0 0 0 ...
+ $ RELIGIOUSC   : int  1 0 1 1 0 1 0 1 1 0 ...
+ $ POLITICALC   : int  1 0 1 1 0 1 0 1 1 0 ...
+ $ MEDIANEDUC   : int  11 12 12 15 12 14 12 13 12 12 ...
+ $ CAND1S       : chr  "S" "S" "S" "S" ...
+ $ CAND2S       : chr  "S" "S" "L" "S" ...
+ $ MESSAGE_A    : int  1 1 1 1 1 1 1 1 1 1 ...
+ $ MESSAGE_A_REV: int  0 0 0 0 0 0 0 0 0 0 ...
+ $ I3           : chr  "N" "N" "N" "N" ...
+ $ CAND1_UND    : chr  "N" "N" "N" "N" ...
+ $ CAND2_UND    : chr  "N" "N" "N" "N" ...
+ $ MOVED_AD     : chr  "N" "N" "Y" "N" ...
+ $ MOVED_A      : int  0 0 1 0 0 1 1 0 1 0 ...
+ $ opposite     : int  1 1 0 1 1 0 0 1 0 1 ...
+
+ Summary of each column
+       X            VOTER_ID          SET_NO         OPP_SEX             AGE             HH_ND      
+ Min.   :    1   Min.   :    13   Min.   :1.000   Min.   : 0.0000   Min.   : 18.00   Min.   :0.000  
+ 1st Qu.: 2501   1st Qu.:152719   1st Qu.:1.000   1st Qu.: 0.0000   1st Qu.: 36.00   1st Qu.:0.000  
+ Median : 5000   Median :310684   Median :2.000   Median : 0.0000   Median : 51.00   Median :1.000  
+ Mean   : 5000   Mean   :313104   Mean   :2.006   Mean   : 0.5874   Mean   : 50.87   Mean   :1.212  
+ 3rd Qu.: 7500   3rd Qu.:470629   3rd Qu.:3.000   3rd Qu.: 0.0000   3rd Qu.: 64.00   3rd Qu.:2.000  
+ Max.   :10000   Max.   :636334   Max.   :3.000   Max.   :86.0000   Max.   :100.00   Max.   :9.000  
+     HH_NR            HH_NI          MED_AGE         NH_WHITE         NH_AA          NH_ASIAN         NH_MULT     
+ Min.   :0.0000   Min.   :0.000   Min.   :25.00   Min.   :23.00   Min.   : 0.00   Min.   : 0.000   Min.   :0.000  
+ 1st Qu.:0.0000   1st Qu.:0.000   1st Qu.:34.00   1st Qu.:58.00   1st Qu.: 5.00   1st Qu.: 1.000   1st Qu.:1.000  
+ Median :0.0000   Median :0.000   Median :38.00   Median :65.00   Median :17.00   Median : 4.000   Median :2.000  
+ Mean   :0.7287   Mean   :0.612   Mean   :39.16   Mean   :66.37   Mean   :21.68   Mean   : 3.575   Mean   :1.937  
+ 3rd Qu.:1.0000   3rd Qu.:1.000   3rd Qu.:44.00   3rd Qu.:85.00   3rd Qu.:30.00   3rd Qu.: 4.000   3rd Qu.:2.000  
+ Max.   :9.0000   Max.   :9.000   Max.   :65.00   Max.   :99.00   Max.   :64.00   Max.   :16.000   Max.   :8.000  
+      HISP          COMM_LT10       COMM_609P        MED_HH_INC        COMM_CAR         COMM_CP      
+ Min.   : 0.000   Min.   : 1.00   Min.   : 0.000   Min.   : 22381   Min.   : 36.00   Min.   : 0.000  
+ 1st Qu.: 2.000   1st Qu.: 7.00   1st Qu.: 4.000   1st Qu.: 51797   1st Qu.: 76.00   1st Qu.: 6.000  
+ Median : 3.000   Median :11.00   Median : 6.000   Median : 59802   Median : 83.00   Median : 8.000  
+ Mean   : 5.885   Mean   :12.95   Mean   : 7.559   Mean   : 70161   Mean   : 80.37   Mean   : 9.102  
+ 3rd Qu.: 6.000   3rd Qu.:17.00   3rd Qu.:10.000   3rd Qu.: 84476   3rd Qu.: 87.00   3rd Qu.:11.000  
+ Max.   :39.000   Max.   :35.00   Max.   :20.000   Max.   :200227   Max.   :100.00   Max.   :36.000  
+    COMM_PT         COMM_WALK           KIDS           M_MAR           F_MAR          ED_4COL     
+ Min.   : 0.000   Min.   : 0.000   Min.   : 3.00   Min.   :15.00   Min.   :10.00   Min.   : 5.00  
+ 1st Qu.: 1.000   1st Qu.: 0.000   1st Qu.:15.00   1st Qu.:44.00   1st Qu.:43.00   1st Qu.:13.00  
+ Median : 2.000   Median : 1.000   Median :19.00   Median :52.00   Median :50.00   Median :17.00  
+ Mean   : 3.873   Mean   : 2.029   Mean   :19.24   Mean   :51.34   Mean   :49.26   Mean   :22.64  
+ 3rd Qu.: 4.000   3rd Qu.: 3.000   3rd Qu.:25.00   3rd Qu.:59.00   3rd Qu.:59.00   3rd Qu.:32.00  
+ Max.   :19.000   Max.   :33.000   Max.   :31.00   Max.   :89.00   Max.   :75.00   Max.   :60.00  
+    GENDER_F         GENDER_M        H_AFDLN3P           H_F1             H_M1          H_MFDLN3P     
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000  
+ Median :1.0000   Median :0.0000   Median :0.0000   Median :0.0000   Median :0.0000   Median :0.0000  
+ Mean   :0.5704   Mean   :0.4296   Mean   :0.0067   Mean   :0.1163   Mean   :0.0687   Mean   :0.0393  
+ 3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:0.0000   3rd Qu.:0.0000   3rd Qu.:0.0000   3rd Qu.:0.0000  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+    PARTY_D          PARTY_I          PARTY_R           VPP_08          VPP_12           VPR_08      
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.000   1st Qu.:0.0000   1st Qu.:0.0000  
+ Median :0.0000   Median :0.0000   Median :0.0000   Median :0.000   Median :0.0000   Median :0.0000  
+ Mean   :0.4743   Mean   :0.2276   Mean   :0.2855   Mean   :0.222   Mean   :0.0487   Mean   :0.1576  
+ 3rd Qu.:1.0000   3rd Qu.:0.0000   3rd Qu.:1.0000   3rd Qu.:0.000   3rd Qu.:0.0000   3rd Qu.:0.0000  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.000   Max.   :1.0000   Max.   :1.0000  
+     VPR_10           VPR_12          VG_04            VG_06           VG_08            VG_10       
+ Min.   :0.0000   Min.   :0.000   Min.   :0.0000   Min.   :0.000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0.0000   1st Qu.:0.000   1st Qu.:0.0000   1st Qu.:0.000   1st Qu.:0.0000   1st Qu.:0.0000  
+ Median :0.0000   Median :0.000   Median :1.0000   Median :0.000   Median :1.0000   Median :1.0000  
+ Mean   :0.1477   Mean   :0.124   Mean   :0.5105   Mean   :0.387   Mean   :0.6294   Mean   :0.5029  
+ 3rd Qu.:0.0000   3rd Qu.:0.000   3rd Qu.:1.0000   3rd Qu.:1.000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+ Max.   :1.0000   Max.   :1.000   Max.   :1.0000   Max.   :1.000   Max.   :1.0000   Max.   :1.0000  
+     VG_12           PP_PELIG         PR_PELIG         AP_PELIG         G_PELIG          E_PELIG      
+ Min.   :0.0000   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
+ 1st Qu.:0.0000   1st Qu.:  0.00   1st Qu.:  0.00   1st Qu.:  0.00   1st Qu.: 33.00   1st Qu.: 20.00  
+ Median :1.0000   Median :  0.00   Median :  0.00   Median :  0.00   Median : 80.00   Median : 40.00  
+ Mean   :0.6983   Mean   : 13.76   Mean   : 14.89   Mean   : 14.98   Mean   : 64.95   Mean   : 40.54  
+ 3rd Qu.:1.0000   3rd Qu.:  0.00   3rd Qu.: 33.00   3rd Qu.: 20.00   3rd Qu.:100.00   3rd Qu.: 60.00  
+ Max.   :1.0000   Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00   Max.   :100.00  
+      NL5G           NL3PR            NL5AP         NL2PP           REG_DAYS         UPSCALEBUY    
+ Min.   :0.000   Min.   :0.0000   Min.   :0.0   Min.   :0.0000   Min.   :    0.0   Min.   :0.0000  
+ 1st Qu.:1.000   1st Qu.:0.0000   1st Qu.:0.0   1st Qu.:0.0000   1st Qu.:  893.8   1st Qu.:0.0000  
+ Median :3.000   Median :0.0000   Median :0.0   Median :0.0000   Median : 3353.5   Median :0.0000  
+ Mean   :2.728   Mean   :0.4293   Mean   :0.7   Mean   :0.2707   Mean   : 4172.8   Mean   :0.0076  
+ 3rd Qu.:5.000   3rd Qu.:1.0000   3rd Qu.:1.0   3rd Qu.:0.0000   3rd Qu.: 6423.5   3rd Qu.:0.0000  
+ Max.   :5.000   Max.   :3.0000   Max.   :5.0   Max.   :2.0000   Max.   :21187.0   Max.   :4.0000  
+   UPSCALEMAL       UPSCALEFEM       BOOKBUYERI      FAMILYMAGA       FEMALEORIE       RELIGIOUSM    
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:1.000   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000  
+ Median :0.0000   Median :0.0000   Median :1.000   Median :1.0000   Median :0.0000   Median :0.0000  
+ Mean   :0.0146   Mean   :0.2765   Mean   :1.456   Mean   :0.6171   Mean   :0.0151   Mean   :0.0003  
+ 3rd Qu.:0.0000   3rd Qu.:1.0000   3rd Qu.:2.000   3rd Qu.:1.0000   3rd Qu.:0.0000   3rd Qu.:0.0000  
+ Max.   :2.0000   Max.   :6.0000   Max.   :9.000   Max.   :9.0000   Max.   :4.0000   Max.   :1.0000  
+   GARDENINGM       CULINARYIN       HEALTHFITN       DOITYOURSE       FINANCIALM       RELIGIOUSC    
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:1.0000   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000  
+ Median :0.0000   Median :0.0000   Median :1.0000   Median :0.0000   Median :0.0000   Median :1.0000  
+ Mean   :0.0305   Mean   :0.0173   Mean   :0.9734   Mean   :0.0451   Mean   :0.1438   Mean   :0.5283  
+ 3rd Qu.:0.0000   3rd Qu.:0.0000   3rd Qu.:1.0000   3rd Qu.:0.0000   3rd Qu.:0.0000   3rd Qu.:1.0000  
+ Max.   :5.0000   Max.   :3.0000   Max.   :9.0000   Max.   :8.0000   Max.   :9.0000   Max.   :7.0000  
+   POLITICALC       MEDIANEDUC      CAND1S             CAND2S            MESSAGE_A   MESSAGE_A_REV
+ Min.   :0.0000   Min.   : 8.0   Length:10000       Length:10000       Min.   :0.0   Min.   :0.0  
+ 1st Qu.:0.0000   1st Qu.:12.0   Class :character   Class :character   1st Qu.:0.0   1st Qu.:0.0  
+ Median :1.0000   Median :12.0   Mode  :character   Mode  :character   Median :0.5   Median :0.5  
+ Mean   :0.5311   Mean   :12.6                                         Mean   :0.5   Mean   :0.5  
+ 3rd Qu.:1.0000   3rd Qu.:13.0                                         3rd Qu.:1.0   3rd Qu.:1.0  
+ Max.   :7.0000   Max.   :16.0                                         Max.   :1.0   Max.   :1.0  
+      I3             CAND1_UND          CAND2_UND           MOVED_AD            MOVED_A          opposite     
+ Length:10000       Length:10000       Length:10000       Length:10000       Min.   :0.0000   Min.   :0.0000  
+ Class :character   Class :character   Class :character   Class :character   1st Qu.:0.0000   1st Qu.:0.0000  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character   Median :0.0000   Median :1.0000  
+                                                                             Mean   :0.3734   Mean   :0.6266  
+                                                                             3rd Qu.:1.0000   3rd Qu.:1.0000  
+                                                                             Max.   :1.0000   Max.   :1.0000  
+
+ Missing values count in each column
+            X      VOTER_ID        SET_NO       OPP_SEX           AGE         HH_ND         HH_NR         HH_NI 
+            0             0             0             0             0             0             0             0 
+      MED_AGE      NH_WHITE         NH_AA      NH_ASIAN       NH_MULT          HISP     COMM_LT10     COMM_609P 
+            0             0             0             0             0             0             0             0 
+   MED_HH_INC      COMM_CAR       COMM_CP       COMM_PT     COMM_WALK          KIDS         M_MAR         F_MAR 
+            0             0             0             0             0             0             0             0 
+      ED_4COL      GENDER_F      GENDER_M     H_AFDLN3P          H_F1          H_M1     H_MFDLN3P       PARTY_D 
+            0             0             0             0             0             0             0             0 
+      PARTY_I       PARTY_R        VPP_08        VPP_12        VPR_08        VPR_10        VPR_12         VG_04 
+            0             0             0             0             0             0             0             0 
+        VG_06         VG_08         VG_10         VG_12      PP_PELIG      PR_PELIG      AP_PELIG       G_PELIG 
+            0             0             0             0             0             0             0             0 
+      E_PELIG          NL5G         NL3PR         NL5AP         NL2PP      REG_DAYS    UPSCALEBUY    UPSCALEMAL 
+            0             0             0             0             0             0             0             0 
+   UPSCALEFEM    BOOKBUYERI    FAMILYMAGA    FEMALEORIE    RELIGIOUSM    GARDENINGM    CULINARYIN    HEALTHFITN 
+            0             0             0             0             0             0             0             0 
+   DOITYOURSE    FINANCIALM    RELIGIOUSC    POLITICALC    MEDIANEDUC        CAND1S        CAND2S     MESSAGE_A 
+            0             0             0             0             0             0             0             0 
+MESSAGE_A_REV            I3     CAND1_UND     CAND2_UND      MOVED_AD       MOVED_A      opposite 
+            0             0             0             0             0             0             0 
+
+ Number of unique voter IDs
+[1] 10000
+
+---------------------------
+
+Exploratory Data Analysis
+
+---------------------------
+
+ Target variable distribution (MOVED_A)
+
+   0    1 
+6266 3734 
+
+ In percentage 
+
+    0     1 
+62.66 37.34 
+
+ Treatment variable distribution (MESSAGE_A)
+
+   0    1 
+5000 5000 
+
+ In percentage 
+
+ 0  1 
+50 50 
+
+Effect of Message treatmet on persuasion
+# A tibble: 2 × 4
+  campain_msg  count Persuaded Persuaded_Per_Msg
+  <chr>        <int>     <int>             <dbl>
+1 Not Received  5000      1722              34.4
+2 Received      5000      2012              40.2
+
+ Party distribution
+
+   Democrat Independent       Other  Republican 
+       4743        2276         126        2855 
+
+ Party Affiliation and the persuaion percentage
+# A tibble: 4 × 9
+  party count message_received persuaded persuaded_mes_rec Mes_rec_per party_per persuaded_per persuaded_mesrec_per
+  <chr> <int>            <int>     <int>             <int>       <dbl>     <dbl>         <dbl>                <dbl>
+1 Demo…  4743             2344      2606              1363        49.4     47.4          54.9                 58.1 
+2 Inde…  2276             1139       912               500        50.0     22.8          40.1                 43.9 
+3 Other   126               69        57                38        54.8      1.26         45.2                 55.1 
+4 Repu…  2855             1448       159               111        50.7     28.6           5.57                 7.67
+
+Female   Male 
+  5704   4296 
+
+ Candidate 1 support, persuasion and treatment
+# A tibble: 3 × 9
+  CAND1S count message_received persuaded persuaded_mes_rec Mes_rec_per party_per persuaded_per
+  <chr>  <int>            <int>     <int>             <int>       <dbl>     <dbl>         <dbl>
+1 L       2228             1125      1661               874        50.5      22.3         74.6 
+2 S       5379             2670       423               254        49.6      53.8          7.86
+3 U       2393             1205      1650               884        50.4      23.9         69.0 
+# ℹ 1 more variable: persuaded_mesrec_per <dbl>
+
+ Candidate 2 support, persuasion and treatment
+# A tibble: 3 × 9
+  CAND2S count message_received persuaded persuaded_mes_rec Mes_rec_per party_per persuaded_per
+  <chr>  <int>            <int>     <int>             <int>       <dbl>     <dbl>         <dbl>
+1 L       1361              682       864               465        50.1     13.6           63.5
+2 S       7968             3991      2610              1407        50.1     79.7           32.8
+3 U        671              327       260               140        48.7      6.71          38.7
+# ℹ 1 more variable: persuaded_mesrec_per <dbl>
+
+---------------------------
+
+Data Visualizations
+
+---------------------------
+
+---------------------------
+
+Preparing Data for modeling
+
+---------------------------
+
+Creating a new variable 'vote_count' 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   1.000   3.000   2.728   5.000   5.000 
+
+Selected columns for Modeling:
+ [1] "MOVED_A"    "MESSAGE_A"  "AGE"        "GENDER"     "MED_HH_INC" "PARTY_D"    "PARTY_R"    "vote_count"
+ [9] "CAND1S"     "CAND2S"    
+
+---------------------------
+
+Model Fitting and Evaluation
+
+---------------------------
+
+--------- Logistic Regression Model-----------
+
+Training data MOVED_A distribution
+
+    0     1 
+62.66 37.34 
+
+Test data MOVED_A distribution
+
+    0     1 
+62.65 37.35 
+
+Logistic Model FitLogistic Regression Model Summary:
+
+Call:
+glm(formula = MOVED_A ~ ., family = "binomial", data = train_voterdata_std)
+
+Coefficients:
+             Estimate Std. Error z value             Pr(>|z|)    
+(Intercept)  1.942296   0.123831  15.685 < 0.0000000000000002 ***
+MESSAGE_A1   0.418391   0.068451   6.112      0.0000000009821 ***
+AGE         -0.096000   0.038362  -2.502              0.01233 *  
+GENDERMale  -1.074481   0.071457 -15.037 < 0.0000000000000002 ***
+MED_HH_INC  -0.007962   0.034840  -0.229              0.81923    
+PARTY_D1    -0.232515   0.087839  -2.647              0.00812 ** 
+PARTY_R1    -0.879704   0.134889  -6.522      0.0000000000695 ***
+vote_count   0.015891   0.040413   0.393              0.69416    
+CAND1SS     -3.325528   0.103462 -32.142 < 0.0000000000000002 ***
+CAND1SU     -0.103337   0.085314  -1.211              0.22580    
+CAND2SS     -0.457188   0.096463  -4.739      0.0000021424743 ***
+CAND2SU     -1.519145   0.135339 -11.225 < 0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 9251.5  on 7000  degrees of freedom
+Residual deviance: 5546.5  on 6989  degrees of freedom
+AIC: 5570.5
+
+Number of Fisher Scoring iterations: 5
+
+Model Evaluation
+Logistic Regression - Confusion Matrix:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1570  142
+         1  309  978
+                                               
+               Accuracy : 0.8496               
+                 95% CI : (0.8363, 0.8622)     
+    No Information Rate : 0.6265               
+    P-Value [Acc > NIR] : < 0.00000000000000022
+                                               
+                  Kappa : 0.688                
+                                               
+ Mcnemar's Test P-Value : 0.000000000000005425 
+                                               
+            Sensitivity : 0.8732               
+            Specificity : 0.8356               
+         Pos Pred Value : 0.7599               
+         Neg Pred Value : 0.9171               
+             Prevalence : 0.3735               
+         Detection Rate : 0.3261               
+   Detection Prevalence : 0.4291               
+      Balanced Accuracy : 0.8544               
+                                               
+       'Positive' Class : 1                    
+                                               
+Setting levels: control = 0, case = 1
+Setting direction: controls < cases
+
+Logistic Regression AUC: 0.8939 
+(AUC ranges from 0.5 to 1.0; higher is better)
+
+Top 5 Positive Effects (increase persuasion):
+            Estimate
+MESSAGE_A1 0.4183909
+
+Top 5 Negative Effects (decrease persuasion):
+             Estimate
+CAND1SS    -3.3255279
+CAND2SU    -1.5191455
+GENDERMale -1.0744807
+PARTY_R1   -0.8797044
+CAND2SS    -0.4571875
+
+Fit the logistic model with interaction terms
+
+Call:
+glm(formula = MOVED_A ~ . + MESSAGE_A:PARTY_R + MESSAGE_A:CAND2S, 
+    family = "binomial", data = train_voterdata_std)
+
+Coefficients:
+                     Estimate Std. Error z value             Pr(>|z|)    
+(Intercept)          1.692687   0.139956  12.094 < 0.0000000000000002 ***
+MESSAGE_A1           0.960830   0.172030   5.585     0.00000002333636 ***
+AGE                 -0.093083   0.038347  -2.427              0.01521 *  
+GENDERMale          -1.077268   0.071491 -15.069 < 0.0000000000000002 ***
+MED_HH_INC          -0.006486   0.034875  -0.186              0.85247    
+PARTY_D1            -0.235636   0.087893  -2.681              0.00734 ** 
+PARTY_R1            -1.282783   0.205316  -6.248     0.00000000041610 ***
+vote_count           0.018367   0.040475   0.454              0.64999    
+CAND1SS             -3.329943   0.103521 -32.167 < 0.0000000000000002 ***
+CAND1SU             -0.094892   0.085309  -1.112              0.26599    
+CAND2SS             -0.090298   0.129264  -0.699              0.48483    
+CAND2SU             -1.295559   0.186722  -6.938     0.00000000000396 ***
+MESSAGE_A1:PARTY_R1  0.639501   0.229232   2.790              0.00527 ** 
+MESSAGE_A1:CAND2SS  -0.762547   0.189437  -4.025     0.00005689626742 ***
+MESSAGE_A1:CAND2SU  -0.496851   0.270307  -1.838              0.06605 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 9251.5  on 7000  degrees of freedom
+Residual deviance: 5524.1  on 6986  degrees of freedom
+AIC: 5554.1
+
+Number of Fisher Scoring iterations: 6
+
+Model Evaluation
+Logistic Regression w. Interacton Terms - Confusion Matrix:
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1568  132
+         1  311  988
+                                               
+               Accuracy : 0.8523               
+                 95% CI : (0.8391, 0.8648)     
+    No Information Rate : 0.6265               
+    P-Value [Acc > NIR] : < 0.00000000000000022
+                                               
+                  Kappa : 0.6942               
+                                               
+ Mcnemar's Test P-Value : < 0.00000000000000022
+                                               
+            Sensitivity : 0.8821               
+            Specificity : 0.8345               
+         Pos Pred Value : 0.7606               
+         Neg Pred Value : 0.9224               
+             Prevalence : 0.3735               
+         Detection Rate : 0.3294               
+   Detection Prevalence : 0.4331               
+      Balanced Accuracy : 0.8583               
+                                               
+       'Positive' Class : 1                    
+                                               
+Setting levels: control = 0, case = 1
+Setting direction: controls < cases
+
+Logistic Regression w. InteractionsAUC: 0.896 
+
+-----------Decision Tree Model--------------
+
+Check the proportion of the train and test data
+
+Training data MOVED_A distribution
+
+    0     1 
+62.66 37.34 
+
+Test data MOVED_A distribution
+
+    0     1 
+62.65 37.35 
+
+   0    1 
+1879 1120 
+
+ Build the Decision tree using training data
+Decision Tree Output
+n= 7001 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 7001 2614 0 (0.626624768 0.373375232)  
+   2) CAND1S=S 3746  301 0 (0.919647624 0.080352376)  
+     4) CAND2S=S 3422   13 0 (0.996201052 0.003798948) *
+     5) CAND2S=L,U 324   36 1 (0.111111111 0.888888889)  
+      10) PARTY_D=1 36    0 0 (1.000000000 0.000000000) *
+      11) PARTY_D=0 288    0 1 (0.000000000 1.000000000) *
+   3) CAND1S=L,U 3255  942 1 (0.289400922 0.710599078)  
+     6) CAND2S=L,U 1116  508 0 (0.544802867 0.455197133)  
+      12) CAND2S=U 387   99 0 (0.744186047 0.255813953)  
+        24) PARTY_D=1 247    0 0 (1.000000000 0.000000000) *
+        25) PARTY_D=0 140   41 1 (0.292857143 0.707142857)  
+          50) CAND1S=U 41    0 0 (1.000000000 0.000000000) *
+          51) CAND1S=L 99    0 1 (0.000000000 1.000000000) *
+      13) CAND2S=L 729  320 1 (0.438957476 0.561042524)  
+        26) CAND1S=L 277   82 0 (0.703971119 0.296028881) *
+        27) CAND1S=U 452  125 1 (0.276548673 0.723451327) *
+     7) CAND2S=S 2139  334 1 (0.156147733 0.843852267)  
+      14) GENDER=Male 843  283 1 (0.335705813 0.664294187)  
+        28) PARTY_D=0 183   65 0 (0.644808743 0.355191257)  
+          56) AGE>=24.5 153   36 0 (0.764705882 0.235294118) *
+          57) AGE< 24.5 30    1 1 (0.033333333 0.966666667) *
+        29) PARTY_D=1 660  165 1 (0.250000000 0.750000000) *
+      15) GENDER=Female 1296   51 1 (0.039351852 0.960648148) *
+
+Predict and evaulate the decision tree using the test data
+
+Decision Tree - Confusion Matrix
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1738   65
+         1  141 1055
+                                               
+               Accuracy : 0.9313               
+                 95% CI : (0.9217, 0.9401)     
+    No Information Rate : 0.6265               
+    P-Value [Acc > NIR] : < 0.00000000000000022
+                                               
+                  Kappa : 0.8552               
+                                               
+ Mcnemar's Test P-Value : 0.0000001737         
+                                               
+            Sensitivity : 0.9420               
+            Specificity : 0.9250               
+         Pos Pred Value : 0.8821               
+         Neg Pred Value : 0.9639               
+             Prevalence : 0.3735               
+         Detection Rate : 0.3518               
+   Detection Prevalence : 0.3988               
+      Balanced Accuracy : 0.9335               
+                                               
+       'Positive' Class : 1                    
+                                               
+
+ The Decision tree seems overfitted as it has high accuracy.
+
+Classification tree:
+rpart(formula = MOVED_A ~ ., data = train_voterdata)
+
+Variables actually used in tree construction:
+[1] AGE     CAND1S  CAND2S  GENDER  PARTY_D
+
+Root node error: 2614/7001 = 0.37338
+
+n= 7001 
+
+        CP nsplit rel error  xerror      xstd
+1 0.524484      0   1.00000 1.00000 0.0154829
+2 0.096404      1   0.47552 0.47552 0.0122317
+3 0.038511      2   0.37911 0.37911 0.0111581
+4 0.022188      5   0.26358 0.27888 0.0097764
+5 0.015685      6   0.24139 0.24445 0.0092185
+6 0.013772      7   0.22571 0.23604 0.0090741
+7 0.010138      8   0.21194 0.21959 0.0087816
+8 0.010000     11   0.18095 0.20964 0.0085978
+
+The best cp value is 0.01 which is the default value. So pruning based on best cp gives the same
+
+So, lets fit the model using the control parameters.
+
+Set the cp value to 0.0137 as per 1-SE rule,
+Increase the cross validation to 20 and
+minbucket to 100 because the default model has very small bucket size 
+
+Pruned Decision Tree
+n= 7001 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 7001 2614 0 (0.626624768 0.373375232)  
+   2) CAND1S=S 3746  301 0 (0.919647624 0.080352376)  
+     4) CAND2S=S 3422   13 0 (0.996201052 0.003798948) *
+     5) CAND2S=L,U 324   36 1 (0.111111111 0.888888889) *
+   3) CAND1S=L,U 3255  942 1 (0.289400922 0.710599078)  
+     6) CAND2S=L,U 1116  508 0 (0.544802867 0.455197133)  
+      12) CAND2S=U 387   99 0 (0.744186047 0.255813953)  
+        24) PARTY_D=1 247    0 0 (1.000000000 0.000000000) *
+        25) PARTY_D=0 140   41 1 (0.292857143 0.707142857) *
+      13) CAND2S=L 729  320 1 (0.438957476 0.561042524)  
+        26) CAND1S=L 277   82 0 (0.703971119 0.296028881) *
+        27) CAND1S=U 452  125 1 (0.276548673 0.723451327) *
+     7) CAND2S=S 2139  334 1 (0.156147733 0.843852267) *
+
+Pruned Decision Tree - Confusion Matrix
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1661   46
+         1  218 1074
+                                               
+               Accuracy : 0.912                
+                 95% CI : (0.9013, 0.9219)     
+    No Information Rate : 0.6265               
+    P-Value [Acc > NIR] : < 0.00000000000000022
+                                               
+                  Kappa : 0.8176               
+                                               
+ Mcnemar's Test P-Value : < 0.00000000000000022
+                                               
+            Sensitivity : 0.9589               
+            Specificity : 0.8840               
+         Pos Pred Value : 0.8313               
+         Neg Pred Value : 0.9731               
+             Prevalence : 0.3735               
+         Detection Rate : 0.3581               
+   Detection Prevalence : 0.4308               
+      Balanced Accuracy : 0.9215               
+                                               
+       'Positive' Class : 1                    
+                                               
+
+Rules of the tree which can be used in Campaign outreach planning:
+ MOVED_A                                                        
+    0.00 when CAND1S is L or U & CAND2S is      U & PARTY_D is 1
+    0.00 when CAND1S is      S & CAND2S is      S               
+    0.30 when CAND1S is      L & CAND2S is      L               
+    0.71 when CAND1S is L or U & CAND2S is      U & PARTY_D is 0
+    0.72 when CAND1S is      U & CAND2S is      L               
+    0.84 when CAND1S is L or U & CAND2S is      S               
+    0.89 when CAND1S is      S & CAND2S is L or U               
+# A tibble: 4 × 4
+  Model                             Accuracy Sensitivity Specificity
+  <chr>                                <dbl>       <dbl>       <dbl>
+1 Logistic Regression                  0.850       0.873       0.836
+2 Logistic Regression (Interaction)    0.852       0.882       0.834
+3 Decision Tree (Unpruned)             0.931       0.942       0.925
+4 Decision Tree (Pruned)               0.912       0.959       0.884
